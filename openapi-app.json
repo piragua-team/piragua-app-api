@@ -1,0 +1,3315 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API institucional Piragua: rutas que consume la app móvil",
+    "version": "1.10.2",
+    "description": "Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. Cada operación lleva dos extensiones: `x-estado`, que vale `en uso` cuando el código del árbol la llama hoy y `propuesto` cuando es un contrato que la versión 1.10.2 necesita y el Sistema todavía tiene que confirmar; y `x-origen`, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es `type: object` con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba `__tests__/openapi-app.test.js` cruza las rutas de `slices/` contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (`__tests__/openapi-ejemplos.test.js` comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en `docs/FORMULARIOS.md`, y `__tests__/formularios-doc.test.js` las ata a `validarLluvia` y a `slices/constants.js`. El manual de referencia en HTML, `docs/api/index.html`, se genera desde este contrato con `node bin/generar-manual-api.mjs`; `__tests__/manual-api.test.js` falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8, la de la especificación oficial del Programa (también en `x-version-api`); los códigos de respuesta, la ruta `/documentos` y la forma de `/multimedias` salen de ella.",
+    "x-version-api": "1.3.8"
+  },
+  "servers": [
+    {
+      "url": "https://geopiragua.corantioquia.gov.co/api/v1",
+      "description": "API institucional. Es la constante `API` de `slices/constants.js` y la `baseURL` de `slices/apiClient.js`."
+    }
+  ],
+  "tags": [
+    {
+      "name": "sesion",
+      "description": "Ingreso, registro y recuperación de contraseña. Se llaman por XMLHttpRequest antes de que exista sesión; no llevan Bearer."
+    },
+    {
+      "name": "usuario",
+      "description": "Perfil, grupo piragüero y eliminación de la cuenta."
+    },
+    {
+      "name": "estaciones",
+      "description": "Estación meteorológica más cercana y clima del día (pantalla de inicio)."
+    },
+    {
+      "name": "medidores",
+      "description": "Estaciones de lluvia del usuario y sus registros de lluvia."
+    },
+    {
+      "name": "contenido",
+      "description": "Noticias, actividades, documentos, multimedia y preguntas frecuentes."
+    },
+    {
+      "name": "observatorios",
+      "description": "Observaciones de campo. El flujo no tiene entrada en el menú."
+    },
+    {
+      "name": "notificaciones",
+      "description": "Registro del dispositivo y umbrales de alerta. Contrato propuesto por la app para la 1.10.2."
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "sesion"
+        ],
+        "summary": "Inicio de sesión (OAuth2, flujo de contraseña)",
+        "description": "La app envía en el cuerpo JSON las credenciales del cliente OAuth2 y las de la persona. La respuesta es el usuario completo con un bloque `oauth2` que trae el `access_token`; la app guarda en el teléfono solo los campos de `ESQUEMA_DE_SESION` (`context/sessionStorage.js`), y el `refresh_token` lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (`slices/tokenDeRenovacion.js`) para renovar el token de acceso con `/oauth2/token/`. `screens/auth/Signup.js` llama a la misma ruta con barra final (`/login/`) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene.",
+        "operationId": "iniciarSesion",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/auth/Signin.js",
+          "screens/auth/Signup.js"
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credenciales"
+              },
+              "example": {
+                "client_id": "cliente-oauth2-de-la-app",
+                "client_secret": "secreto-del-cliente-oauth2",
+                "username": "persona.ejemplo@ejemplo.gov.co",
+                "password": "contraseña-de-ejemplo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada. La app comprueba que exista `oauth2`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sesion"
+                },
+                "example": {
+                  "id": 1024,
+                  "nombres": "Persona",
+                  "apellidos": "De Ejemplo",
+                  "email": "persona.ejemplo@ejemplo.gov.co",
+                  "telefono": "3000000000",
+                  "fecha_nacimiento": "2003-05-14",
+                  "genero": "ND",
+                  "municipio": 7,
+                  "grupo_piraguero": 12,
+                  "flags": {
+                    "mide_lluvia": true,
+                    "gestor_limnigrafico": false,
+                    "gestor_pluviografico": false,
+                    "gestor_geografico": false,
+                    "integrante": true
+                  },
+                  "empresa": null,
+                  "oauth2": {
+                    "access_token": "token-de-acceso-de-ejemplo",
+                    "token_type": "Bearer",
+                    "expires_in": 36000,
+                    "refresh_token": "token-de-refresco-de-ejemplo",
+                    "scope": "read write"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "description": "Credenciales rechazadas. La app muestra `error_description`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOAuth2"
+                },
+                "example": {
+                  "error": "invalid_grant",
+                  "error_description": "Usuario o contraseña incorrectos."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth2/revoke_token/": {
+      "post": {
+        "tags": [
+          "sesion"
+        ],
+        "summary": "Revocar los tokens de la sesión al cerrarla",
+        "description": "Propuesta de la app para la 1.10.3: al cerrar sesión, después de dar de baja el dispositivo (`DELETE /dispositivos/{token}`) y antes de borrar la sesión del teléfono, la app pide revocar el `access_token` y, si lo tiene guardado, el `refresh_token` (dos llamadas a la vez, cada una con su `token_type_hint`) para que dejen de valer aunque quede una copia fuera del teléfono. Es la ruta de revocación del servicio OAuth2 del API; el Sistema debe confirmar dónde está montada y qué responde. La app la llama con URL absoluta y sin Bearer: se autentica con el mismo par de cliente que el inicio de sesión, en un formulario. Es de mejor esfuerzo: sin red, con un rechazo o pasado el límite de espera la sesión local se borra igual y no se muestra nada (`revocarToken`, `slices/servicios/usuarios.js`).",
+        "operationId": "revocarToken",
+        "x-estado": "propuesto",
+        "x-origen": [
+          "context/AuthProvider.js",
+          "slices/servicios/usuarios.js"
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token",
+                  "client_id",
+                  "client_secret"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Token de acceso o de renovación de la sesión que se cierra."
+                  },
+                  "token_type_hint": {
+                    "type": "string",
+                    "enum": [
+                      "access_token",
+                      "refresh_token"
+                    ]
+                  },
+                  "client_id": {
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "token": "token-de-acceso-de-ejemplo",
+                "token_type_hint": "access_token",
+                "client_id": "cliente-oauth2-de-la-app",
+                "client_secret": "secreto-del-cliente-oauth2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token revocado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoDocumentada"
+                },
+                "examples": {
+                  "cuerpoNoDocumentado": {
+                    "summary": "Cuerpo no documentado por el Sistema",
+                    "description": "La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.",
+                    "value": {}
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/oauth2/token/": {
+      "post": {
+        "tags": [
+          "sesion"
+        ],
+        "summary": "Renovar el token de acceso con el token de renovación",
+        "description": "Propuesta de la app para la 1.10.3: cuando una ruta del API contesta 401 a una petición con el Bearer de la sesión, la app pide aquí un token de acceso nuevo con el `refresh_token` del inicio de sesión (flujo `refresh_token` de OAuth2) y repite la petición una vez con él. Todas las peticiones que reciban 401 mientras tanto esperan a esa misma renovación. La ruta no figura en la documentación del API: se da por hecha porque es la de emisión de tokens del mismo servicio OAuth2 que atiende `/oauth2/revoke_token/`, y el Sistema debe confirmar dónde está montada y qué responde. La app la llama con URL absoluta y sin Bearer, en un formulario con el mismo par de cliente que el inicio de sesión. Si la respuesta trae un `refresh_token` nuevo, la app lo guarda en lugar del anterior; si no, conserva el anterior. Cualquier respuesta de error (400 `invalid_grant`, 401 `invalid_client`, un 404 si la ruta no existe) cierra la sesión como antes de existir la renovación; si no hay respuesta (sin red, límite de espera agotado), la sesión sigue abierta y la petición original falla con su 401 (`renovarToken`, `slices/servicios/usuarios.js`; `slices/apiClient.js`).",
+        "operationId": "renovarToken",
+        "x-estado": "propuesto",
+        "x-origen": [
+          "context/AuthProvider.js",
+          "slices/servicios/usuarios.js"
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "grant_type",
+                  "refresh_token",
+                  "client_id",
+                  "client_secret"
+                ],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": [
+                      "refresh_token"
+                    ]
+                  },
+                  "refresh_token": {
+                    "type": "string",
+                    "description": "Token de renovación que entregó el inicio de sesión o la última renovación."
+                  },
+                  "client_id": {
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "grant_type": "refresh_token",
+                "refresh_token": "token-de-refresco-de-ejemplo",
+                "client_id": "cliente-oauth2-de-la-app",
+                "client_secret": "secreto-del-cliente-oauth2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token renovado. La app lee `access_token` y, si viene, `refresh_token`; una respuesta sin `access_token` cuenta como rechazo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2"
+                },
+                "example": {
+                  "access_token": "token-de-acceso-renovado-de-ejemplo",
+                  "token_type": "Bearer",
+                  "expires_in": 36000,
+                  "refresh_token": "token-de-refresco-renovado-de-ejemplo",
+                  "scope": "read write"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "description": "Token de renovación rechazado (vencido, revocado o ya usado). La app cierra la sesión.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOAuth2"
+                },
+                "example": {
+                  "error": "invalid_grant",
+                  "error_description": "Invalid refresh token"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "post": {
+        "tags": [
+          "sesion"
+        ],
+        "summary": "Registro de una cuenta nueva",
+        "description": "La app llama a la ruta con barra final (`/usuarios/`). La respuesta se da por buena si trae `id`; a continuación la app inicia sesión con `/login/`. Un 400 llega con mensajes por campo (por ejemplo `user.username` con la lista de errores); si el correo ya existe, la app lo explica, porque el Sistema conserva el usuario de autenticación de las cuentas eliminadas.",
+        "operationId": "registrarUsuario",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/auth/Signup.js"
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Registro"
+              },
+              "example": {
+                "client_id": "cliente-oauth2-de-la-app",
+                "client_secret": "secreto-del-cliente-oauth2",
+                "user": {
+                  "username": "persona.ejemplo@ejemplo.gov.co",
+                  "password": "contraseña-de-ejemplo"
+                },
+                "nombres": "Persona",
+                "apellidos": "De Ejemplo",
+                "email": "persona.ejemplo@ejemplo.gov.co",
+                "identificacion": "persona.ejemplo@ejemplo.gov.co",
+                "tipo_identificacion": "CODIGO",
+                "genero": "ND",
+                "rango_edad": "14-28",
+                "fecha_nacimiento": "2003-05-14"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cuenta creada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                },
+                "example": {
+                  "id": 1024,
+                  "nombres": "Persona",
+                  "apellidos": "De Ejemplo",
+                  "email": "persona.ejemplo@ejemplo.gov.co",
+                  "telefono": "3000000000",
+                  "fecha_nacimiento": "2003-05-14",
+                  "genero": "ND",
+                  "municipio": 7,
+                  "grupo_piraguero": 12,
+                  "flags": {
+                    "mide_lluvia": true,
+                    "gestor_limnigrafico": false,
+                    "gestor_pluviografico": false,
+                    "gestor_geografico": false,
+                    "integrante": true
+                  },
+                  "empresa": null
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeValidacion"
+          }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "tags": [
+          "sesion"
+        ],
+        "summary": "Contraseña temporal por correo",
+        "description": "Recibe el correo como `username` junto con las credenciales del cliente. La app da la solicitud por aceptada cuando la respuesta trae `ok`; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse.",
+        "operationId": "recuperarContrasena",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/auth/Forgot.js"
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "client_id",
+                  "client_secret",
+                  "username"
+                ],
+                "properties": {
+                  "client_id": {
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Correo de la cuenta, en minúsculas."
+                  }
+                }
+              },
+              "example": {
+                "client_id": "cliente-oauth2-de-la-app",
+                "client_secret": "secreto-del-cliente-oauth2",
+                "username": "persona.ejemplo@ejemplo.gov.co"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Solicitud aceptada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": {
+                  "ok": true
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/usuarioId"
+        }
+      ],
+      "patch": {
+        "tags": [
+          "usuario"
+        ],
+        "summary": "Actualizar el perfil",
+        "description": "Actualización parcial. `screens/user/UserEdit.js` envía empresa, banderas, teléfono, grupo piragüero, municipio y, si se cambió, `user.password`; `screens/user/Grupo.js` envía solo `municipio` y `grupo_piraguero`. La respuesta es el usuario actualizado (la app comprueba `id`) y se vuelve a guardar en el teléfono con el `oauth2` que ya tenía.",
+        "operationId": "actualizarUsuario",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/user/UserEdit.js",
+          "screens/user/Grupo.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioParcial"
+              },
+              "example": {
+                "empresa": {
+                  "contacto_principal": "Contacto de ejemplo",
+                  "direccion": "Calle 1 # 2-3",
+                  "razon_social": "Empresa de ejemplo"
+                },
+                "flags": {
+                  "mide_lluvia": true,
+                  "gestor_limnigrafico": false,
+                  "gestor_pluviografico": false,
+                  "gestor_geografico": false,
+                  "integrante": true
+                },
+                "telefono": "3000000000",
+                "grupo_piraguero": 12,
+                "municipio": 7,
+                "user": {
+                  "password": "contraseña-nueva-de-ejemplo"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                },
+                "example": {
+                  "id": 1024,
+                  "nombres": "Persona",
+                  "apellidos": "De Ejemplo",
+                  "email": "persona.ejemplo@ejemplo.gov.co",
+                  "telefono": "3000000000",
+                  "fecha_nacimiento": "2003-05-14",
+                  "genero": "ND",
+                  "municipio": 7,
+                  "grupo_piraguero": 12,
+                  "flags": {
+                    "mide_lluvia": true,
+                    "gestor_limnigrafico": false,
+                    "gestor_pluviografico": false,
+                    "gestor_geografico": false,
+                    "integrante": true
+                  },
+                  "empresa": {
+                    "contacto_principal": "Contacto de ejemplo",
+                    "nombre_comercial": "Empresa de ejemplo",
+                    "direccion": "Calle 1 # 2-3"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeValidacion"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "usuario"
+        ],
+        "summary": "Eliminar la cuenta",
+        "description": "Elimina los datos personales y conserva, anonimizados, los registros de monitoreo aportados al Programa; esa semántica la define el Sistema. Tras el éxito la app cierra la sesión local. Ruta base en `ELIMINAR_CUENTA_PATH` (`slices/constants.js`).",
+        "operationId": "eliminarCuenta",
+        "x-estado": "en uso",
+        "x-origen": [
+          "slices/userActions.js",
+          "screens/user/EliminarCuenta.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cuenta eliminada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoDocumentada"
+                },
+                "examples": {
+                  "cuerpoNoDocumentado": {
+                    "summary": "Cuerpo no documentado por el Sistema",
+                    "description": "La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.",
+                    "value": {}
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}/medidores": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/usuarioId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "medidores"
+        ],
+        "summary": "Estaciones de lluvia del usuario",
+        "operationId": "listarMedidores",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/stations/Estaciones.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada. La app lee `values` y de cada elemento `id`, `activo`, `codigo`, `ubicacion`, `latitud` y `longitud`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeMedidores"
+                },
+                "example": {
+                  "count": 2,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 501,
+                      "codigo": "PLV-0501",
+                      "nombre": "Pluviómetro vereda La Clara",
+                      "ubicacion": "Vereda La Clara, predio El Recreo",
+                      "activo": true,
+                      "latitud": 6.2518,
+                      "longitud": -75.5636
+                    },
+                    {
+                      "id": 502,
+                      "codigo": "PLV-0502",
+                      "nombre": "Pluviómetro escuela rural",
+                      "ubicacion": "Escuela rural, sede principal",
+                      "activo": false,
+                      "latitud": 6.2601,
+                      "longitud": -75.5702
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "medidores"
+        ],
+        "summary": "Registrar una estación de lluvia",
+        "description": "El campo del formulario `fuente` viaja como `predio`. Las coordenadas salen del GPS del teléfono con siete decimales y viajan como número; la altitud, redondeada a entero. La estación queda pendiente de aprobación por el Programa.",
+        "operationId": "crearMedidor",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/stations/Registroestacion.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MedidorNuevo"
+              },
+              "example": {
+                "predio": "Predio El Recreo",
+                "ubicacion": "Vereda La Clara",
+                "latitud": 6.2518,
+                "longitud": -75.5636,
+                "altitud": 1495,
+                "version_formulario": "2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Estación registrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Medidor"
+                },
+                "example": {
+                  "id": 503,
+                  "codigo": "PLV-0503",
+                  "nombre": "Pluviómetro predio El Recreo",
+                  "ubicacion": "Vereda La Clara",
+                  "activo": false,
+                  "latitud": 6.2518,
+                  "longitud": -75.5636
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeValidacion"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}/medidores/{medidorId}/registros": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/usuarioId"
+        },
+        {
+          "name": "medidorId",
+          "in": "path",
+          "required": true,
+          "description": "Identificador de la estación de lluvia del usuario.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "medidores"
+        ],
+        "summary": "Registros de lluvia de una estación",
+        "operationId": "listarLluviometros",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/stations/Detalleestacion.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada; la app ordena `values` por `fecha` descendente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeLluviometros"
+                },
+                "example": {
+                  "count": 2,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 9002,
+                      "fecha": "2026-09-20T07:00:00",
+                      "muestra": "12.5"
+                    },
+                    {
+                      "id": 9001,
+                      "fecha": "2026-09-19T07:00:00",
+                      "muestra": "0"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "medidores"
+        ],
+        "summary": "Guardar un registro de lluvia",
+        "operationId": "crearLluviometro",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/stations/Detalleestacion.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LluviometroNuevo"
+              },
+              "example": {
+                "fecha": "2026-09-20 07:00",
+                "muestra": "12.5",
+                "observacion": "Aguacero corto en la madrugada.",
+                "version_formulario": "1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registro guardado; la app comprueba `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lluviometro"
+                },
+                "example": {
+                  "id": 9002,
+                  "fecha": "2026-09-20T07:00:00",
+                  "muestra": "12.5"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeValidacion"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}/favoritos": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/usuarioId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Actividades marcadas como favoritas",
+        "operationId": "listarFavoritos",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/tabs/Events.js",
+          "screens/tabs/Favoritos.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada; cada elemento trae `actividad` con el identificador de la actividad.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeFavoritos"
+                },
+                "example": {
+                  "count": 1,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 77,
+                      "actividad": 310
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Marcar una actividad como favorita",
+        "operationId": "crearFavorito",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/tabs/Events.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoritoNuevo"
+              },
+              "example": {
+                "actividad": 310
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Favorito creado; la app comprueba `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Favorito"
+                },
+                "example": {
+                  "id": 77,
+                  "actividad": 310
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Retirar una actividad de favoritos",
+        "description": "El identificador de la actividad viaja en el cuerpo de la petición DELETE, no en la ruta.",
+        "operationId": "eliminarFavorito",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/tabs/Events.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoritoNuevo"
+              },
+              "example": {
+                "actividad": 310
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Favorito retirado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoDocumentada"
+                },
+                "examples": {
+                  "cuerpoNoDocumentado": {
+                    "summary": "Cuerpo no documentado por el Sistema",
+                    "description": "La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.",
+                    "value": {}
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/municipios": {
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Catálogo de municipios",
+        "description": "Se carga al arrancar la app (`context/MunicipiosProvider.js`), con o sin sesión. Con sesión activa el cliente HTTP adjunta el Bearer; la ruta responde igual sin él.",
+        "operationId": "listarMunicipios",
+        "x-estado": "en uso",
+        "x-origen": [
+          "context/MunicipiosProvider.js",
+          "screens/drawer/Notifications.js",
+          "screens/user/UserEdit.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "simple",
+            "in": "query",
+            "description": "La app siempre envía `1` para recibir solo identificador y nombre.",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de municipios.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeMunicipios"
+                },
+                "example": {
+                  "count": 2,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 7,
+                      "nombre": "Municipio de ejemplo"
+                    },
+                    {
+                      "id": 8,
+                      "nombre": "Otro municipio de ejemplo"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/municipios/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Identificador del municipio.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Un municipio",
+        "operationId": "obtenerMunicipio",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/home/Home.js",
+          "screens/observatorio/Detalleobs.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "La app lee `nombre`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Municipio"
+                },
+                "example": {
+                  "id": 7,
+                  "nombre": "Municipio de ejemplo"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/estaciones": {
+      "get": {
+        "tags": [
+          "estaciones"
+        ],
+        "summary": "Estación meteorológica más cercana",
+        "description": "Con `latitud`, `longitud` y `tipo=8` la respuesta es UNA estación (no una lista): la más cercana a las coordenadas. Las coordenadas viajan truncadas a los decimales que fija la pantalla de inicio, porque quedan escritas en los registros del servidor.",
+        "operationId": "estacionMasCercana",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/home/Home.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "latitud",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "longitud",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "tipo",
+            "in": "query",
+            "required": true,
+            "description": "La app envía siempre `8` (estación meteorológica).",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "La app lee `codigo`, `municipio`, `fuente` y `ubicacion`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estacion"
+                },
+                "example": {
+                  "codigo": "MET-0101",
+                  "municipio": 7,
+                  "fuente": "Quebrada La Clara",
+                  "ubicacion": "Vereda El Cedro"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/estaciones/{codigo}/meteorologia/diario": {
+      "parameters": [
+        {
+          "name": "codigo",
+          "in": "path",
+          "required": true,
+          "description": "Código de la estación, tal como lo devuelve `/estaciones`.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "estaciones"
+        ],
+        "summary": "Resumen meteorológico diario de una estación",
+        "description": "La app pide `size=1` y usa el primer elemento de `values`; cada magnitud se muestra solo si su bandera `calidad_*` vale 1.",
+        "operationId": "meteorologiaDiaria",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/home/Home.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de resúmenes diarios.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeMeteorologiaDiaria"
+                },
+                "example": {
+                  "count": 1,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "lluvia": 4.2,
+                      "calidad_lluvia": 1,
+                      "temperatura": 21.7,
+                      "calidad_temperatura": 1,
+                      "humedad_relativa": 78,
+                      "calidad_humedad_relativa": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/noticias": {
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Noticias del Programa",
+        "operationId": "listarNoticias",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/home/Home.js",
+          "screens/home/Newsletter.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada; la app pide `size=10`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeNoticias"
+                },
+                "example": {
+                  "count": 1,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 12,
+                      "titulo": "Jornada de monitoreo comunitario",
+                      "imagen": "https://geopiragua.corantioquia.gov.co/media/noticias/jornada.jpg"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/actividades": {
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Cursos y eventos",
+        "description": "La pantalla de actividades hace tres llamadas seguidas: por año, por año y mes, y por año, mes y semana. Separa los elementos por `tipo` (`Evento` frente al resto).",
+        "operationId": "listarActividades",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/tabs/Events.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            }
+          },
+          {
+            "name": "week",
+            "in": "query",
+            "description": "Semana del año calculada por la app.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de actividades.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeActividades"
+                },
+                "example": {
+                  "count": 2,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 310,
+                      "tipo": "Evento",
+                      "title": "Encuentro de piragüeros",
+                      "imagen": "https://geopiragua.corantioquia.gov.co/media/actividades/encuentro.jpg",
+                      "url": "https://piragua.corantioquia.gov.co/actividades/310"
+                    },
+                    {
+                      "id": 311,
+                      "tipo": "Curso",
+                      "title": "Curso de medición de lluvia",
+                      "imagen": "https://geopiragua.corantioquia.gov.co/media/actividades/curso.jpg",
+                      "url": "https://piragua.corantioquia.gov.co/actividades/311"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/multimedias": {
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Imágenes y videos del portal",
+        "operationId": "listarMultimedia",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/tabs/Multimedia.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada; la app pide `size=100`. El tipo va en cada archivo (`archivos[].tipo`, `Imagen` o `Video`) y la app lo lee sin distinguir mayúsculas: una pieza con algún `Video` se reproduce; la miniatura es su imagen principal.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeMultimedia"
+                },
+                "example": {
+                  "count": 2,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 90,
+                      "titulo": "Aprendemos juntos",
+                      "componente": 5,
+                      "resumen": "Pieza gráfica de la campaña de lluvias.",
+                      "activo": true,
+                      "archivos": [
+                        {
+                          "id": 46,
+                          "tipo": "Imagen",
+                          "archivo": "https://geopiragua.corantioquia.gov.co/media/app/multimedia/aprendemos-juntos.png",
+                          "es_principal": true
+                        }
+                      ]
+                    },
+                    {
+                      "id": 58,
+                      "titulo": "Cómo registrar la lluvia",
+                      "componente": 5,
+                      "resumen": "Video corto del registro diario.",
+                      "activo": true,
+                      "archivos": [
+                        {
+                          "id": 5,
+                          "tipo": "Video",
+                          "archivo": "https://geopiragua.corantioquia.gov.co/media/app/multimedia/registrar-lluvia.mp4",
+                          "es_principal": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/documentos": {
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Documentos del Programa",
+        "description": "Documentos que el Programa publica para descargar. No traen `id` y `tipo` vale `DOCUMENTO`. `archivo` es el documento, que abre «DESCÁRGALO», y `portada` su carátula, que la app pinta como miniatura. La especificación no declara paginación; la app pide `size=100`, igual que en `/multimedias`, donde el API sí pagina. Si esta ruta falla, la pestaña sigue mostrando la multimedia.",
+        "operationId": "listarDocumentos",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/tabs/Multimedia.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de documentos, en `values`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeDocumentos"
+                },
+                "example": {
+                  "values": [
+                    {
+                      "titulo": "Guía del pluviómetro",
+                      "descripcion": "<p>Cómo instalar el pluviómetro y leer la lluvia del día.</p>",
+                      "tipo": "DOCUMENTO",
+                      "archivo": "https://geopiragua.corantioquia.gov.co/media/app/documentacion/guia-pluviometro.pdf",
+                      "portada": "https://geopiragua.corantioquia.gov.co/media/app/documentacion/guia-pluviometro.webp"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/grupos-piragueros": {
+      "get": {
+        "tags": [
+          "usuario"
+        ],
+        "summary": "Grupos piragüeros",
+        "operationId": "listarGruposPiragueros",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/user/Grupo.js",
+          "screens/user/UserEdit.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "municipio",
+            "in": "query",
+            "description": "Identificador del municipio para filtrar los grupos.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de grupos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeGrupos"
+                },
+                "example": {
+                  "count": 2,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 12,
+                      "nombre": "Grupo piragüero de ejemplo",
+                      "codigo": "GP-012",
+                      "tipo_nombre": "Grupo de monitoreo comunitario",
+                      "descripcion": "Grupo que mide la lluvia y observa la quebrada La Clara."
+                    },
+                    {
+                      "id": 13,
+                      "nombre": null,
+                      "codigo": "GP-013",
+                      "tipo_nombre": "Institución educativa",
+                      "descripcion": "Escuela rural vinculada al Programa."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/observatorios": {
+      "get": {
+        "tags": [
+          "observatorios"
+        ],
+        "summary": "Observaciones de campo",
+        "description": "Lo llama `listarObservaciones` (`slices/observatorio.js`) con `page` y `size`. El API responde hoy con `values` sin paginar; si un día pagina, `count`, `next` y `previous` pasan tal cual.",
+        "operationId": "listarObservatorios",
+        "x-estado": "en uso",
+        "x-origen": [
+          "slices/observatorio.js",
+          "screens/observatorio/Listadoobs.js",
+          "screens/observatorio/Detalleobs.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Página, desde 1.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Observaciones por página; la app pide 50.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada; la forma de cada elemento no está documentada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeObservatorios"
+                },
+                "example": {
+                  "count": 1,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 88,
+                      "fecha": "2026-09-20",
+                      "categoria": "Fauna",
+                      "tipo": "Avistamiento",
+                      "actividad": "Recorrido de monitoreo",
+                      "descripcion": "Garza observada en la orilla de la quebrada La Clara.",
+                      "altitud": "1495",
+                      "latitud": "6.2518",
+                      "longitud": "-75.5636",
+                      "foto": "https://geopiragua.corantioquia.gov.co/media/observatorios/88.jpg",
+                      "municipio": 7
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "observatorios"
+        ],
+        "summary": "Registrar una observación con fotografía",
+        "description": "Única llamada multipart de la app: `crearObservacion` (`slices/observatorio.js`) envía el `FormData` armado por el formulario a través del cliente HTTP unificado, que añade el Bearer. La observación queda pendiente de aprobación por el Programa; la app comprueba `id` en la respuesta. El API solo exige `fecha`, `municipio`, `categoria`, `tipo` y `actividad`; la app exige además una `descripcion` de al menos 10 caracteres, sin contar los espacios de los extremos, y la `foto`, y sin ellas no envía la observación (`validarObservacion`, `slices/observatorio.js`). Es un criterio de la app, no del API: la descripción mínima cuida la calidad del dato y la foto es la evidencia visual de lo observado.",
+        "operationId": "crearObservatorio",
+        "x-estado": "en uso",
+        "x-origen": [
+          "slices/observatorio.js",
+          "screens/observatorio/Registroobs.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservatorioNuevo"
+              },
+              "example": {
+                "fecha": "2026-09-20",
+                "categoria": "Fauna",
+                "tipo": "Avistamiento",
+                "actividad": "Recorrido de monitoreo",
+                "descripcion": "Garza observada en la orilla de la quebrada La Clara.",
+                "altitud": "1495",
+                "latitud": "6.2518",
+                "longitud": "-75.5636",
+                "foto": "observacion.jpg",
+                "municipio": 7
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Observación registrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Observatorio"
+                },
+                "example": {
+                  "id": 88,
+                  "fecha": "2026-09-20",
+                  "categoria": "Fauna",
+                  "tipo": "Avistamiento",
+                  "actividad": "Recorrido de monitoreo",
+                  "descripcion": "Garza observada en la orilla de la quebrada La Clara.",
+                  "altitud": "1495",
+                  "latitud": "6.2518",
+                  "longitud": "-75.5636",
+                  "foto": "https://geopiragua.corantioquia.gov.co/media/observatorios/88.jpg",
+                  "municipio": 7
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeValidacion"
+          }
+        }
+      }
+    },
+    "/observatorios/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Identificador de la observación.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "observatorios"
+        ],
+        "summary": "Detalle de una observación",
+        "description": "Lo consume el servicio de observatorios de la 1.10.2 (`slices/observatorio.js`). La forma de la respuesta no está documentada.",
+        "operationId": "obtenerObservatorio",
+        "x-estado": "en uso",
+        "x-origen": [
+          "slices/observatorio.js"
+        ],
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Una observación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Observatorio"
+                },
+                "example": {
+                  "id": 88,
+                  "fecha": "2026-09-20",
+                  "categoria": "Fauna",
+                  "tipo": "Avistamiento",
+                  "actividad": "Recorrido de monitoreo",
+                  "descripcion": "Garza observada en la orilla de la quebrada La Clara.",
+                  "altitud": "1495",
+                  "latitud": "6.2518",
+                  "longitud": "-75.5636",
+                  "foto": "https://geopiragua.corantioquia.gov.co/media/observatorios/88.jpg",
+                  "municipio": 7
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/faqs": {
+      "servers": [
+        {
+          "url": "https://piragua.corantioquia.gov.co/api/v1",
+          "description": "Portal del Programa. Es otro host: el cliente HTTP atiende la URL absoluta sin adjuntar el Bearer y sin que un 401 cierre la sesión."
+        }
+      ],
+      "get": {
+        "tags": [
+          "contenido"
+        ],
+        "summary": "Preguntas frecuentes",
+        "operationId": "listarPreguntasFrecuentes",
+        "x-estado": "en uso",
+        "x-origen": [
+          "screens/drawer/Questions.js"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Lista paginada; la app filtra por `topics` (`CONOCENOS` o `VINCULACION`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDePreguntas"
+                },
+                "example": {
+                  "count": 2,
+                  "next": null,
+                  "previous": null,
+                  "values": [
+                    {
+                      "id": 3,
+                      "pregunta": "¿Qué es Piragua?",
+                      "respuesta": "Programa integral de red de agua de Corantioquia.",
+                      "topics": "CONOCENOS"
+                    },
+                    {
+                      "id": 4,
+                      "pregunta": "¿Cómo me vinculo?",
+                      "respuesta": "Registra tu cuenta en la app y elige tu grupo piragüero.",
+                      "topics": "VINCULACION"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/dispositivos": {
+      "post": {
+        "tags": [
+          "notificaciones"
+        ],
+        "summary": "Registrar el dispositivo que recibe notificaciones",
+        "description": "Propuesta de la app para la 1.10.2: tras obtener el token de notificaciones de Expo, la app lo asocia a la cuenta para que el Sistema le envíe las alertas de umbrales a través del servicio de notificaciones de Expo. Ruta en `DISPOSITIVOS_PATH` (`slices/constants.js`). El Sistema debe confirmar ruta, método y forma.",
+        "operationId": "registrarDispositivo",
+        "x-estado": "propuesto",
+        "x-origen": [
+          "slices/notificaciones.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Dispositivo"
+              },
+              "example": {
+                "token": "ExponentPushToken[ejemplo000000000000000]",
+                "plataforma": "android",
+                "version_app": "1.10.2",
+                "modelo": "Modelo de ejemplo",
+                "so": "Android 14"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dispositivo registrado. La app acepta 200 o 201 y lee `id` si viene.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DispositivoRegistrado"
+                },
+                "example": {
+                  "id": 7
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Dispositivo registrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DispositivoRegistrado"
+                },
+                "example": {
+                  "id": 7
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/dispositivos/{token}": {
+      "parameters": [
+        {
+          "name": "token",
+          "in": "path",
+          "required": true,
+          "description": "Token de notificaciones de Expo registrado con `POST /dispositivos`.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "delete": {
+        "tags": [
+          "notificaciones"
+        ],
+        "summary": "Dar de baja el dispositivo",
+        "description": "Propuesta de la app para la 1.10.2: al cerrar sesión o desactivar las alertas, el token deja de recibir notificaciones. El Sistema debe confirmar ruta, método y forma.",
+        "operationId": "eliminarDispositivo",
+        "x-estado": "propuesto",
+        "x-origen": [
+          "slices/notificaciones.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dispositivo dado de baja.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoDocumentada"
+                },
+                "examples": {
+                  "cuerpoNoDocumentado": {
+                    "summary": "Cuerpo no documentado por el Sistema",
+                    "description": "La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.",
+                    "value": {}
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      }
+    },
+    "/usuarios/{id}/umbrales": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/usuarioId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "notificaciones"
+        ],
+        "summary": "Umbrales de alerta del usuario",
+        "description": "Propuesta de la app para la 1.10.2. Ruta en `UMBRALES_PATH(usuarioId)` (`slices/constants.js`). La app guarda una copia local de los umbrales y encola los cambios hechos sin conexión. El Sistema debe confirmar ruta, método y forma.",
+        "operationId": "obtenerUmbrales",
+        "x-estado": "propuesto",
+        "x-origen": [
+          "slices/notificaciones.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Umbrales vigentes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Umbrales"
+                },
+                "example": {
+                  "municipios": [
+                    7,
+                    8
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeCliente"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "notificaciones"
+        ],
+        "summary": "Guardar los umbrales de alerta del usuario",
+        "description": "Propuesta de la app para la 1.10.2: reemplaza el conjunto de umbrales. Es la operación que la cola de sincronización reenvía cuando vuelve la conexión. El Sistema debe confirmar ruta, método y forma.",
+        "operationId": "guardarUmbrales",
+        "x-estado": "propuesto",
+        "x-origen": [
+          "slices/notificaciones.js"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Umbrales"
+              },
+              "example": {
+                "municipios": [
+                  7,
+                  8
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Umbrales guardados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Umbrales"
+                },
+                "example": {
+                  "municipios": [
+                    7,
+                    8
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NoAutorizado"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/ErrorDeValidacion"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "oauth2",
+        "description": "Token de acceso OAuth2 obtenido con el flujo de contraseña sobre `POST /login`, que recibe `client_id`, `client_secret`, `username` y `password` en un cuerpo JSON (no en formulario) y devuelve el token dentro de `oauth2.access_token`. `slices/apiClient.js` añade `Authorization: Bearer <token>` a toda petición relativa mientras haya sesión y cierra la sesión local ante el primer 401 de cada ráfaga. Nunca se envía a URL absolutas de otros hosts.",
+        "flows": {
+          "password": {
+            "tokenUrl": "https://geopiragua.corantioquia.gov.co/api/v1/login",
+            "scopes": {}
+          }
+        }
+      }
+    },
+    "parameters": {
+      "usuarioId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Identificador del usuario con sesión (`id` de la respuesta de `/login`).",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "size": {
+        "name": "size",
+        "in": "query",
+        "description": "Tamaño de página de las listas paginadas.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "responses": {
+      "NoAutorizado": {
+        "description": "Sin sesión válida. En rutas relativas del API institucional, `slices/apiClient.js` cierra la sesión local y la app vuelve a la pantalla de ingreso.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "detail": "Las credenciales de autenticación no se proveyeron."
+            }
+          }
+        }
+      },
+      "ErrorDeCliente": {
+        "description": "Error del cliente distinto de 401. La app muestra `detail`, `error`, `errors` o `non_field_errors` cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "detail": "No encontrado."
+            }
+          }
+        }
+      },
+      "ErrorDeValidacion": {
+        "description": "Error de validación de un formulario: además de las claves de `Error`, el cuerpo puede traer mensajes por campo (`{ campo: 'mensaje' }` o `{ campo: ['mensaje'] }`), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; `detail`, `non_field_errors` y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorDeValidacion"
+            },
+            "example": {
+              "telefono": [
+                "Este campo es obligatorio."
+              ],
+              "user": {
+                "username": [
+                  "Ya existe una cuenta con este correo."
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "NoDocumentada": {
+        "type": "object",
+        "description": "forma no documentada"
+      },
+      "ListaPaginada": {
+        "type": "object",
+        "description": "Envoltorio de toda lista del API institucional. La app lee `values`; `next` y `previous` son las URL de las páginas contiguas.",
+        "required": [
+          "values"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "string",
+            "nullable": true
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "description": "Claves de error que la app sabe leer (`slices/userActions.js`, `slices/mapActions.js`). Ninguna es obligatoria.",
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "errors": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "non_field_errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorDeValidacion": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Error"
+          },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "ErrorOAuth2": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "error_description": {
+            "type": "string"
+          }
+        }
+      },
+      "Credenciales": {
+        "type": "object",
+        "required": [
+          "client_id",
+          "client_secret",
+          "username",
+          "password"
+        ],
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "description": "Cliente OAuth2 de la app, inyectado en tiempo de compilación."
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "format": "email",
+            "description": "Correo de la cuenta, en minúsculas."
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "OAuth2": {
+        "type": "object",
+        "description": "Bloque `oauth2` de la respuesta de `/login`, y respuesta de `/oauth2/token/`. La app persiste en la sesión solo `access_token`; `refresh_token` lo guarda aparte, cifrado, para renovar el token de acceso; el resto de claves no las lee ningún fichero del árbol.",
+        "required": [
+          "access_token"
+        ],
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string"
+          },
+          "expires_in": {
+            "type": "integer"
+          },
+          "refresh_token": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        }
+      },
+      "Sesion": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Usuario"
+          },
+          {
+            "type": "object",
+            "required": [
+              "oauth2"
+            ],
+            "properties": {
+              "oauth2": {
+                "$ref": "#/components/schemas/OAuth2"
+              }
+            }
+          }
+        ]
+      },
+      "Usuario": {
+        "type": "object",
+        "description": "Campos del usuario que alguna pantalla lee (`ESQUEMA_DE_SESION` en `context/sessionStorage.js`). El API devuelve más; la app no los persiste.",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombres": {
+            "type": "string"
+          },
+          "apellidos": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_nacimiento": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "genero": {
+            "type": "string",
+            "enum": [
+              "HOMBRE",
+              "MUJER",
+              "ND"
+            ]
+          },
+          "municipio": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Identificador del municipio."
+          },
+          "grupo_piraguero": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Identificador del grupo piragüero."
+          },
+          "flags": {
+            "$ref": "#/components/schemas/Banderas"
+          },
+          "empresa": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "contacto_principal": {
+                "type": "string"
+              },
+              "nombre_comercial": {
+                "type": "string"
+              },
+              "direccion": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Banderas": {
+        "type": "object",
+        "properties": {
+          "mide_lluvia": {
+            "type": "boolean"
+          },
+          "gestor_limnigrafico": {
+            "type": "boolean"
+          },
+          "gestor_pluviografico": {
+            "type": "boolean"
+          },
+          "gestor_geografico": {
+            "type": "boolean"
+          },
+          "integrante": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Registro": {
+        "type": "object",
+        "description": "Cuerpo del registro (`screens/auth/Signup.js`). `identificacion` lleva el correo y `tipo_identificacion` vale siempre `CODIGO`; `rango_edad` se deriva de la fecha de nacimiento.",
+        "required": [
+          "client_id",
+          "client_secret",
+          "user",
+          "nombres",
+          "apellidos",
+          "email",
+          "identificacion",
+          "tipo_identificacion",
+          "genero",
+          "rango_edad"
+        ],
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "required": [
+              "username",
+              "password"
+            ],
+            "properties": {
+              "username": {
+                "type": "string",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "format": "password"
+              }
+            }
+          },
+          "nombres": {
+            "type": "string"
+          },
+          "apellidos": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "identificacion": {
+            "type": "string"
+          },
+          "tipo_identificacion": {
+            "type": "string",
+            "enum": [
+              "CODIGO"
+            ]
+          },
+          "genero": {
+            "type": "string",
+            "enum": [
+              "HOMBRE",
+              "MUJER",
+              "ND"
+            ]
+          },
+          "rango_edad": {
+            "type": "string",
+            "description": "Tramo de edad en años cumplidos que la app calcula con la fecha de nacimiento; sin ella, o con una que no permite calcular la edad, `INDETERMINADO`. Vocabulario y fuente en `docs/vocabulario-rango-edad.md`.",
+            "enum": [
+              "INDETERMINADO",
+              "0-6",
+              "7-13",
+              "14-28",
+              "29-45",
+              "46-60",
+              "MAYOR DE 60"
+            ]
+          },
+          "fecha_nacimiento": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "UsuarioParcial": {
+        "type": "object",
+        "description": "Cuerpo del PATCH del perfil. Todas las claves son opcionales.",
+        "properties": {
+          "empresa": {
+            "type": "object",
+            "properties": {
+              "contacto_principal": {
+                "type": "string"
+              },
+              "direccion": {
+                "type": "string"
+              },
+              "razon_social": {
+                "type": "string"
+              }
+            }
+          },
+          "flags": {
+            "$ref": "#/components/schemas/Banderas"
+          },
+          "telefono": {
+            "type": "string"
+          },
+          "grupo_piraguero": {
+            "type": "integer"
+          },
+          "municipio": {
+            "type": "integer"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "password": {
+                "type": "string",
+                "format": "password"
+              }
+            }
+          }
+        }
+      },
+      "Municipio": {
+        "type": "object",
+        "required": [
+          "id",
+          "nombre"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string"
+          }
+        }
+      },
+      "ListaDeMunicipios": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Municipio"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Estacion": {
+        "type": "object",
+        "description": "Campos de la estación que lee la pantalla de inicio; el API devuelve más.",
+        "required": [
+          "codigo",
+          "municipio"
+        ],
+        "properties": {
+          "codigo": {
+            "type": "string"
+          },
+          "municipio": {
+            "type": "integer",
+            "description": "Identificador del municipio; se resuelve con `/municipios/{id}`."
+          },
+          "fuente": {
+            "type": "string",
+            "nullable": true
+          },
+          "ubicacion": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "MeteorologiaDiaria": {
+        "type": "object",
+        "properties": {
+          "lluvia": {
+            "type": "number"
+          },
+          "calidad_lluvia": {
+            "type": "integer",
+            "description": "1 cuando el dato es válido."
+          },
+          "temperatura": {
+            "type": "number"
+          },
+          "calidad_temperatura": {
+            "type": "integer"
+          },
+          "humedad_relativa": {
+            "type": "number"
+          },
+          "calidad_humedad_relativa": {
+            "type": "integer"
+          }
+        }
+      },
+      "ListaDeMeteorologiaDiaria": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/MeteorologiaDiaria"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Medidor": {
+        "type": "object",
+        "description": "Estación de lluvia del usuario. Campos que la app lee (`screens/stations/Estaciones.js`, `screens/stations/Detalleestacion.js`); el API devuelve más.",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "codigo": {
+            "type": "string",
+            "description": "Código de la estación; la lista lo muestra en mayúsculas."
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "ubicacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "description": "Falso mientras el Programa no la habilite; la app la muestra como «Inactiva»."
+          },
+          "latitud": {
+            "type": "number"
+          },
+          "longitud": {
+            "type": "number"
+          }
+        }
+      },
+      "MedidorNuevo": {
+        "type": "object",
+        "description": "Alta de una estación de lluvia tal como la arma `screens/stations/Registroestacion.js`. Campos obligatorios, rangos y política de versiones en `docs/FORMULARIOS.md`.",
+        "required": [
+          "predio",
+          "ubicacion",
+          "latitud",
+          "longitud",
+          "altitud"
+        ],
+        "properties": {
+          "predio": {
+            "type": "string",
+            "description": "Nombre del predio o la fuente; en el formulario se llama `fuente`."
+          },
+          "ubicacion": {
+            "type": "string"
+          },
+          "latitud": {
+            "type": "number",
+            "description": "Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de `x-minimo` y `x-maximo`.",
+            "x-minimo": -90,
+            "x-maximo": 90,
+            "x-unidad": "grados"
+          },
+          "longitud": {
+            "type": "number",
+            "description": "Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de `x-minimo` y `x-maximo`.",
+            "x-minimo": -180,
+            "x-maximo": 180,
+            "x-unidad": "grados"
+          },
+          "altitud": {
+            "type": "integer",
+            "description": "Metros. La pantalla redondea la que se escribe con decimales y no envía el alta sin ella: la especificación del API 1.3.8 la exige.",
+            "x-unidad": "metros"
+          },
+          "version_formulario": {
+            "type": "string",
+            "description": "Versión del formulario que originó el registro: `VERSION_FORMULARIO_MEDIDOR` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`."
+          }
+        }
+      },
+      "ListaDeMedidores": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Medidor"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Lluviometro": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time",
+            "description": "La pantalla de detalle muestra la fecha (`AAAA-MM-DD`) y la hora (`HH:MM`) a partir de esta cadena."
+          },
+          "muestra": {
+            "type": "string",
+            "description": "Milímetros registrados, como los escribe la persona."
+          }
+        }
+      },
+      "LluviometroNuevo": {
+        "type": "object",
+        "description": "Registro de lluvia tal como lo arma `screens/stations/Detalleestacion.js`. Antes de enviarlo o de dejarlo en la cola sin conexión, `validarLluvia` (`slices/servicios/estaciones.js`) exige los dos campos obligatorios, la muestra dentro del rango y una fecha que exista y no sea posterior a hoy; lo que no pasa no sale del teléfono. Reglas completas y política de versiones en `docs/FORMULARIOS.md`.",
+        "required": [
+          "fecha",
+          "muestra"
+        ],
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:[ T]\\d{2}:\\d{2}(?::\\d{2})?)?$",
+            "description": "Fecha y hora de la lectura en la hora local del teléfono. El selector entrega `AAAA-MM-DD HH:mm`; la app admite también `AAAA-MM-DD`, el separador `T` y los segundos. Tiene que ser una fecha que exista y no posterior a hoy (`x-no-posterior-a`): vale cualquier hora del día de hoy, hasta las 23:59; un día posterior no.",
+            "x-no-posterior-a": "hoy"
+          },
+          "muestra": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^\\d+(?:\\.\\d+)?$",
+            "description": "Milímetros de lluvia, como texto decimal con punto (`12.5`). Entre `x-minimo` y `x-maximo`, ambos incluidos: de 0 a 500 mm.",
+            "x-minimo": 0,
+            "x-maximo": 500,
+            "x-unidad": "mm"
+          },
+          "observacion": {
+            "type": "string",
+            "description": "Comentario libre de la lectura; puede ir vacío."
+          },
+          "version_formulario": {
+            "type": "string",
+            "description": "Versión del formulario que originó el registro: `VERSION_FORMULARIO_LLUVIA` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`."
+          }
+        }
+      },
+      "ListaDeLluviometros": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Lluviometro"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Favorito": {
+        "type": "object",
+        "required": [
+          "actividad"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "actividad": {
+            "type": "integer",
+            "description": "Identificador de la actividad."
+          }
+        }
+      },
+      "FavoritoNuevo": {
+        "type": "object",
+        "required": [
+          "actividad"
+        ],
+        "properties": {
+          "actividad": {
+            "type": "integer"
+          }
+        }
+      },
+      "ListaDeFavoritos": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Favorito"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Actividad": {
+        "type": "object",
+        "description": "Campos que leen las pantallas de actividades y favoritos; el API devuelve más.",
+        "required": [
+          "id",
+          "tipo"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "tipo": {
+            "type": "string",
+            "description": "`Evento` para los eventos; el resto se muestra como cursos."
+          },
+          "title": {
+            "type": "string"
+          },
+          "imagen": {
+            "type": "string",
+            "format": "uri"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "Página de la actividad en el portal; la pantalla la abre si viene."
+          }
+        }
+      },
+      "ListaDeActividades": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Actividad"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Noticia": {
+        "type": "object",
+        "description": "La pantalla de inicio recorre `values` y lee `id`, `titulo` e `imagen`; el resto de claves no está fijado por contrato.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "titulo": {
+            "type": "string"
+          },
+          "imagen": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "ListaDeNoticias": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Noticia"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Multimedia": {
+        "type": "object",
+        "description": "Pieza de `GET /multimedias` en el API 1.3.8. No trae `tipo` ni `enlace`: el tipo va en cada archivo. La app abre el archivo principal (o el primero) y toma como miniatura la imagen principal (o la primera).",
+        "required": [
+          "id",
+          "titulo",
+          "archivos"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "titulo": {
+            "type": "string"
+          },
+          "componente": {
+            "type": "integer"
+          },
+          "resumen": {
+            "type": "string"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "archivos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MultimediaArchivo"
+            }
+          }
+        }
+      },
+      "MultimediaArchivo": {
+        "type": "object",
+        "required": [
+          "tipo",
+          "archivo"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "Imagen",
+              "Video"
+            ],
+            "description": "La app lo compara sin distinguir mayúsculas."
+          },
+          "archivo": {
+            "type": "string",
+            "format": "uri"
+          },
+          "es_principal": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ListaDeMultimedia": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Multimedia"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Documento": {
+        "type": "object",
+        "description": "Documento de `GET /documentos` en el API 1.3.8. No trae `id`.",
+        "required": [
+          "titulo",
+          "archivo"
+        ],
+        "properties": {
+          "titulo": {
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string",
+            "description": "HTML; la app no lo muestra."
+          },
+          "tipo": {
+            "type": "string",
+            "description": "`DOCUMENTO`."
+          },
+          "archivo": {
+            "type": "string",
+            "format": "uri",
+            "description": "El documento; es lo que abre «DESCÁRGALO»."
+          },
+          "portada": {
+            "type": "string",
+            "format": "uri",
+            "description": "Carátula; la app la pinta como miniatura."
+          }
+        }
+      },
+      "ListaDeDocumentos": {
+        "type": "object",
+        "description": "Envoltorio de `GET /documentos`. La especificación solo declara `values`.",
+        "required": [
+          "values"
+        ],
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Documento"
+            }
+          }
+        }
+      },
+      "GrupoPiraguero": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cuando viene vacío, la edición del perfil muestra el `id`."
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipo_nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "Campos que leen `screens/user/Grupo.js` y `screens/user/UserEdit.js`; el API devuelve más."
+      },
+      "ListaDeGrupos": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GrupoPiraguero"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Pregunta": {
+        "type": "object",
+        "required": [
+          "pregunta",
+          "topics"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "pregunta": {
+            "type": "string"
+          },
+          "respuesta": {
+            "type": "string",
+            "description": "El portal la entrega con un máximo de 255 caracteres."
+          },
+          "topics": {
+            "type": "string",
+            "enum": [
+              "CONOCENOS",
+              "VINCULACION"
+            ]
+          }
+        }
+      },
+      "ListaDePreguntas": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Pregunta"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Observatorio": {
+        "type": "object",
+        "description": "Forma no documentada por el Sistema: la app comprueba `id` al crear y muestra la lista tal como llega. El ejemplo repite los campos que la app envía al crear; el Sistema debe confirmar cuáles devuelve."
+      },
+      "ObservatorioNuevo": {
+        "type": "object",
+        "required": [
+          "fecha",
+          "categoria",
+          "tipo",
+          "actividad",
+          "descripcion",
+          "latitud",
+          "longitud",
+          "foto",
+          "municipio"
+        ],
+        "properties": {
+          "fecha": {
+            "type": "string"
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string"
+          },
+          "actividad": {
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string"
+          },
+          "altitud": {
+            "type": "string"
+          },
+          "longitud": {
+            "type": "string"
+          },
+          "latitud": {
+            "type": "string"
+          },
+          "foto": {
+            "type": "string",
+            "format": "binary",
+            "description": "Fotografía JPEG tomada con la cámara."
+          },
+          "municipio": {
+            "type": "integer"
+          }
+        }
+      },
+      "ListaDeObservatorios": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ListaPaginada"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Observatorio"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Dispositivo": {
+        "type": "object",
+        "description": "Cuerpo que envía `registrarDispositivo` (`slices/notificaciones.js`). Propuesta de la app para la 1.10.2; el Sistema debe confirmar la forma.",
+        "required": [
+          "token",
+          "plataforma"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token de notificaciones de Expo del dispositivo."
+          },
+          "plataforma": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "version_app": {
+            "type": "string",
+            "description": "Versión de la app instalada."
+          },
+          "modelo": {
+            "type": "string",
+            "description": "Modelo del dispositivo."
+          },
+          "so": {
+            "type": "string",
+            "description": "Sistema operativo y versión."
+          }
+        }
+      },
+      "DispositivoRegistrado": {
+        "type": "object",
+        "description": "La app lee `id` si viene; el resto de la forma no está documentada.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        }
+      },
+      "Umbrales": {
+        "type": "object",
+        "description": "Municipios con umbral de alerta activo. Es lo que envía `guardarUmbrales` (`slices/notificaciones.js`); al leer, la app acepta esta forma, la lista suelta o la lista bajo `values`. Propuesta de la app para la 1.10.2, pendiente de acordar con el Sistema.",
+        "required": [
+          "municipios"
+        ],
+        "properties": {
+          "municipios": {
+            "type": "array",
+            "description": "Identificadores de municipio.",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  }
+}

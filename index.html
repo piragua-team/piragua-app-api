@@ -1,0 +1,3869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API institucional Piragua: rutas que consume la app móvil</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --fondo: #ffffff;
+  --texto: #1d2327;
+  --suave: #5b646b;
+  --borde: #d5dade;
+  --panel: #f4f6f7;
+  --enlace: #0b5d8f;
+  --error: #9b2c2c;
+  --get: #1f6f43;
+  --post: #0b5d8f;
+  --put: #7a5200;
+  --patch: #6b3fa0;
+  --delete: #9b2c2c;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #15191c;
+    --texto: #e6e9eb;
+    --suave: #a3acb3;
+    --borde: #3a4248;
+    --panel: #1f2529;
+    --enlace: #7cc4f2;
+    --error: #f0a3a3;
+    --get: #7fd3a3;
+    --post: #7cc4f2;
+    --put: #f0c674;
+    --patch: #c9a8f0;
+    --delete: #f0a3a3;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+header, nav, main { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }
+header { padding-top: 1.5rem; }
+h1 { font-size: 1.6rem; line-height: 1.25; }
+h2 { font-size: 1.35rem; margin-top: 2.5rem; border-bottom: 2px solid var(--borde); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin-top: 2rem; }
+h4 { font-size: 1.05rem; margin: 0 0 .5rem; overflow-wrap: anywhere; }
+h5 { font-size: .95rem; margin: 1.25rem 0 .5rem; }
+a { color: var(--enlace); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .875em; }
+code { overflow-wrap: anywhere; }
+pre { background: var(--panel); border: 1px solid var(--borde); border-radius: 6px; padding: .75rem; overflow-x: auto; margin: .25rem 0 .75rem; }
+.meta, .nota, .reglas, .rotulo, .medio { color: var(--suave); }
+.reglas, .rotulo, .medio { font-size: .9rem; margin: .25rem 0; }
+nav ul { padding-left: 1.25rem; }
+nav li { margin: .1rem 0; }
+.operacion, .esquema, .compartido { border: 1px solid var(--borde); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+.metodo { display: inline-block; min-width: 4.2rem; font-family: ui-monospace, Menlo, monospace; font-weight: 700; }
+.metodo-get { color: var(--get); }
+.metodo-post { color: var(--post); }
+.metodo-put { color: var(--put); }
+.metodo-patch { color: var(--patch); }
+.metodo-delete { color: var(--delete); }
+.resumen { font-weight: 600; margin: 0 0 .5rem; }
+.aviso { font-weight: 600; }
+dl.datos { display: grid; grid-template-columns: max-content 1fr; gap: .15rem 1rem; margin: .5rem 0; }
+dl.datos dt { color: var(--suave); }
+dl.datos dd { margin: 0; }
+.respuesta { border-left: 4px solid var(--borde); padding-left: .75rem; margin: .75rem 0; }
+.respuesta.error { border-left-color: var(--error); }
+.titulo-respuesta { font-weight: 600; }
+.codigo { font-family: ui-monospace, Menlo, monospace; margin-right: .5rem; }
+.tabla { overflow-x: auto; margin: .5rem 0; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { border: 1px solid var(--borde); padding: .35rem .5rem; text-align: left; vertical-align: top; }
+th { background: var(--panel); }
+td p { margin: 0 0 .25rem; }
+details { margin: .5rem 0; }
+summary { cursor: pointer; color: var(--enlace); }
+@media (max-width: 40rem) {
+  dl.datos { grid-template-columns: 1fr; }
+  dl.datos dd { margin-bottom: .35rem; }
+}
+</style>
+</head>
+<body>
+<!-- Generado por bin/generar-manual-api.mjs a partir del contrato OpenAPI. No se edita a mano: se cambia el contrato y se regenera. -->
+<header id="inicio">
+<h1>API institucional Piragua: rutas que consume la app móvil</h1>
+<p class="meta">Versión del contrato <code>1.10.2</code> · OpenAPI <code>3.0.3</code> · 31 operaciones · 45 esquemas</p>
+<p>Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. Cada operación lleva dos extensiones: <code>x-estado</code>, que vale <code>en uso</code> cuando el código del árbol la llama hoy y <code>propuesto</code> cuando es un contrato que la versión 1.10.2 necesita y el Sistema todavía tiene que confirmar; y <code>x-origen</code>, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es <code>type: object</code> con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba <code>__tests__/openapi-app.test.js</code> cruza las rutas de <code>slices/</code> contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (<code>__tests__/openapi-ejemplos.test.js</code> comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en <code>docs/FORMULARIOS.md</code>, y <code>__tests__/formularios-doc.test.js</code> las ata a <code>validarLluvia</code> y a <code>slices/constants.js</code>. El manual de referencia en HTML, <code>docs/api/index.html</code>, se genera desde este contrato con <code>node bin/generar-manual-api.mjs</code>; <code>__tests__/manual-api.test.js</code> falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8, la de la especificación oficial del Programa (también en <code>x-version-api</code>); los códigos de respuesta, la ruta <code>/documentos</code> y la forma de <code>/multimedias</code> salen de ella.</p>
+<p class="nota">Página generada por <code>bin/generar-manual-api.mjs</code> a partir de <code>docs/openapi-app.json</code>. No se edita a mano: se cambia el contrato y se regenera; <code>__tests__/manual-api.test.js</code> falla si el manual guardado no corresponde al contrato.</p>
+</header>
+<nav id="indice" aria-label="Índice">
+<h2>Índice</h2>
+<ul>
+<li><a href="#servidores">Servidores</a></li>
+<li><a href="#seguridad">Autenticación</a></li>
+<li><a href="#operaciones">Operaciones</a>
+<ul>
+<li class="grupo"><a href="#etiqueta-sesion">sesion</a>
+<ul>
+<li><a href="#op-iniciarSesion"><span class="metodo metodo-post">POST</span> <code>/login</code></a></li>
+<li><a href="#op-revocarToken"><span class="metodo metodo-post">POST</span> <code>/oauth2/revoke_token/</code></a></li>
+<li><a href="#op-renovarToken"><span class="metodo metodo-post">POST</span> <code>/oauth2/token/</code></a></li>
+<li><a href="#op-registrarUsuario"><span class="metodo metodo-post">POST</span> <code>/usuarios</code></a></li>
+<li><a href="#op-recuperarContrasena"><span class="metodo metodo-post">POST</span> <code>/forgot-password</code></a></li>
+</ul>
+</li>
+<li class="grupo"><a href="#etiqueta-usuario">usuario</a>
+<ul>
+<li><a href="#op-actualizarUsuario"><span class="metodo metodo-patch">PATCH</span> <code>/usuarios/{id}</code></a></li>
+<li><a href="#op-eliminarCuenta"><span class="metodo metodo-delete">DELETE</span> <code>/usuarios/{id}</code></a></li>
+<li><a href="#op-listarGruposPiragueros"><span class="metodo metodo-get">GET</span> <code>/grupos-piragueros</code></a></li>
+</ul>
+</li>
+<li class="grupo"><a href="#etiqueta-estaciones">estaciones</a>
+<ul>
+<li><a href="#op-estacionMasCercana"><span class="metodo metodo-get">GET</span> <code>/estaciones</code></a></li>
+<li><a href="#op-meteorologiaDiaria"><span class="metodo metodo-get">GET</span> <code>/estaciones/{codigo}/meteorologia/diario</code></a></li>
+</ul>
+</li>
+<li class="grupo"><a href="#etiqueta-medidores">medidores</a>
+<ul>
+<li><a href="#op-listarMedidores"><span class="metodo metodo-get">GET</span> <code>/usuarios/{id}/medidores</code></a></li>
+<li><a href="#op-crearMedidor"><span class="metodo metodo-post">POST</span> <code>/usuarios/{id}/medidores</code></a></li>
+<li><a href="#op-listarLluviometros"><span class="metodo metodo-get">GET</span> <code>/usuarios/{id}/medidores/{medidorId}/registros</code></a></li>
+<li><a href="#op-crearLluviometro"><span class="metodo metodo-post">POST</span> <code>/usuarios/{id}/medidores/{medidorId}/registros</code></a></li>
+</ul>
+</li>
+<li class="grupo"><a href="#etiqueta-contenido">contenido</a>
+<ul>
+<li><a href="#op-listarFavoritos"><span class="metodo metodo-get">GET</span> <code>/usuarios/{id}/favoritos</code></a></li>
+<li><a href="#op-crearFavorito"><span class="metodo metodo-post">POST</span> <code>/usuarios/{id}/favoritos</code></a></li>
+<li><a href="#op-eliminarFavorito"><span class="metodo metodo-delete">DELETE</span> <code>/usuarios/{id}/favoritos</code></a></li>
+<li><a href="#op-listarMunicipios"><span class="metodo metodo-get">GET</span> <code>/municipios</code></a></li>
+<li><a href="#op-obtenerMunicipio"><span class="metodo metodo-get">GET</span> <code>/municipios/{id}</code></a></li>
+<li><a href="#op-listarNoticias"><span class="metodo metodo-get">GET</span> <code>/noticias</code></a></li>
+<li><a href="#op-listarActividades"><span class="metodo metodo-get">GET</span> <code>/actividades</code></a></li>
+<li><a href="#op-listarMultimedia"><span class="metodo metodo-get">GET</span> <code>/multimedias</code></a></li>
+<li><a href="#op-listarDocumentos"><span class="metodo metodo-get">GET</span> <code>/documentos</code></a></li>
+<li><a href="#op-listarPreguntasFrecuentes"><span class="metodo metodo-get">GET</span> <code>/faqs</code></a></li>
+</ul>
+</li>
+<li class="grupo"><a href="#etiqueta-observatorios">observatorios</a>
+<ul>
+<li><a href="#op-listarObservatorios"><span class="metodo metodo-get">GET</span> <code>/observatorios</code></a></li>
+<li><a href="#op-crearObservatorio"><span class="metodo metodo-post">POST</span> <code>/observatorios</code></a></li>
+<li><a href="#op-obtenerObservatorio"><span class="metodo metodo-get">GET</span> <code>/observatorios/{id}</code></a></li>
+</ul>
+</li>
+<li class="grupo"><a href="#etiqueta-notificaciones">notificaciones</a>
+<ul>
+<li><a href="#op-registrarDispositivo"><span class="metodo metodo-post">POST</span> <code>/dispositivos</code></a></li>
+<li><a href="#op-eliminarDispositivo"><span class="metodo metodo-delete">DELETE</span> <code>/dispositivos/{token}</code></a></li>
+<li><a href="#op-obtenerUmbrales"><span class="metodo metodo-get">GET</span> <code>/usuarios/{id}/umbrales</code></a></li>
+<li><a href="#op-guardarUmbrales"><span class="metodo metodo-put">PUT</span> <code>/usuarios/{id}/umbrales</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#esquemas">Esquemas</a></li>
+<li><a href="#respuestas">Respuestas compartidas</a></li>
+<li><a href="#parametros">Parámetros compartidos</a></li>
+</ul>
+</nav>
+<main>
+<div id="servidores">
+<h2>Servidores</h2>
+<ul class="servidores">
+<li><code>https://geopiragua.corantioquia.gov.co/api/v1</code> · API institucional. Es la constante <code>API</code> de <code>slices/constants.js</code> y la <code>baseURL</code> de <code>slices/apiClient.js</code>.</li>
+</ul>
+</div>
+<div id="seguridad">
+<h2>Autenticación</h2>
+<section id="seguridad-bearer" class="compartido">
+<h3><code>bearer</code> · oauth2</h3>
+<p>Token de acceso OAuth2 obtenido con el flujo de contraseña sobre <code>POST /login</code>, que recibe <code>client_id</code>, <code>client_secret</code>, <code>username</code> y <code>password</code> en un cuerpo JSON (no en formulario) y devuelve el token dentro de <code>oauth2.access_token</code>. <code>slices/apiClient.js</code> añade <code>Authorization: Bearer &lt;token&gt;</code> a toda petición relativa mientras haya sesión y cierra la sesión local ante el primer 401 de cada ráfaga. Nunca se envía a URL absolutas de otros hosts.</p>
+<p class="reglas">flujo <code>password</code> · <code>tokenUrl</code>: <code>https://geopiragua.corantioquia.gov.co/api/v1/login</code> · sin alcances</p>
+</section>
+</div>
+<div id="operaciones">
+<h2>Operaciones</h2>
+<div id="etiqueta-sesion" class="grupo">
+<h3>sesion</h3>
+<p>Ingreso, registro y recuperación de contraseña. Se llaman por XMLHttpRequest antes de que exista sesión; no llevan Bearer.</p>
+<section id="op-iniciarSesion" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/login</code></h4>
+<p class="resumen">Inicio de sesión (OAuth2, flujo de contraseña)</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>iniciarSesion</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/auth/Signin.js</code>, <code>screens/auth/Signup.js</code></dd>
+<dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
+</dl>
+<p>La app envía en el cuerpo JSON las credenciales del cliente OAuth2 y las de la persona. La respuesta es el usuario completo con un bloque <code>oauth2</code> que trae el <code>access_token</code>; la app guarda en el teléfono solo los campos de <code>ESQUEMA_DE_SESION</code> (<code>context/sessionStorage.js</code>), y el <code>refresh_token</code> lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (<code>slices/tokenDeRenovacion.js</code>) para renovar el token de acceso con <code>/oauth2/token/</code>. <code>screens/auth/Signup.js</code> llama a la misma ruta con barra final (<code>/login/</code>) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene.</p>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Credenciales"><code>Credenciales</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
+  &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;,
+  &quot;username&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+  &quot;password&quot;: &quot;contraseña-de-ejemplo&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Sesión iniciada. La app comprueba que exista <code>oauth2</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Sesion"><code>Sesion</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 1024,
+  &quot;nombres&quot;: &quot;Persona&quot;,
+  &quot;apellidos&quot;: &quot;De Ejemplo&quot;,
+  &quot;email&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+  &quot;telefono&quot;: &quot;3000000000&quot;,
+  &quot;fecha_nacimiento&quot;: &quot;2003-05-14&quot;,
+  &quot;genero&quot;: &quot;ND&quot;,
+  &quot;municipio&quot;: 7,
+  &quot;grupo_piraguero&quot;: 12,
+  &quot;flags&quot;: {
+    &quot;mide_lluvia&quot;: true,
+    &quot;gestor_limnigrafico&quot;: false,
+    &quot;gestor_pluviografico&quot;: false,
+    &quot;gestor_geografico&quot;: false,
+    &quot;integrante&quot;: true
+  },
+  &quot;empresa&quot;: null,
+  &quot;oauth2&quot;: {
+    &quot;access_token&quot;: &quot;token-de-acceso-de-ejemplo&quot;,
+    &quot;token_type&quot;: &quot;Bearer&quot;,
+    &quot;expires_in&quot;: 36000,
+    &quot;refresh_token&quot;: &quot;token-de-refresco-de-ejemplo&quot;,
+    &quot;scope&quot;: &quot;read write&quot;
+  }
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> Credenciales rechazadas. La app muestra <code>error_description</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ErrorOAuth2"><code>ErrorOAuth2</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;error&quot;: &quot;invalid_grant&quot;,
+  &quot;error_description&quot;: &quot;Usuario o contraseña incorrectos.&quot;
+}</pre>
+</div>
+</section>
+<section id="op-revocarToken" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/oauth2/revoke_token/</code></h4>
+<p class="resumen">Revocar los tokens de la sesión al cerrarla</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>revocarToken</code></dd>
+<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-origen</code></dt><dd><code>context/AuthProvider.js</code>, <code>slices/servicios/usuarios.js</code></dd>
+<dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
+</dl>
+<p>Propuesta de la app para la 1.10.3: al cerrar sesión, después de dar de baja el dispositivo (<code>DELETE /dispositivos/{token}</code>) y antes de borrar la sesión del teléfono, la app pide revocar el <code>access_token</code> y, si lo tiene guardado, el <code>refresh_token</code> (dos llamadas a la vez, cada una con su <code>token_type_hint</code>) para que dejen de valer aunque quede una copia fuera del teléfono. Es la ruta de revocación del servicio OAuth2 del API; el Sistema debe confirmar dónde está montada y qué responde. La app la llama con URL absoluta y sin Bearer: se autentica con el mismo par de cliente que el inicio de sesión, en un formulario. Es de mejor esfuerzo: sin red, con un rechazo o pasado el límite de espera la sesión local se borra igual y no se muestra nada (<code>revocarToken</code>, <code>slices/servicios/usuarios.js</code>).</p>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/x-www-form-urlencoded</code></p>
+<p>Esquema en línea: <code>object</code></p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>token</code></td><td><code>string</code></td><td>sí</td><td><p>Token de acceso o de renovación de la sesión que se cierra.</p></td></tr>
+<tr><td><code>token_type_hint</code></td><td><code>string</code></td><td>no</td><td><p class="reglas">valores: <code>&quot;access_token&quot;</code>, <code>&quot;refresh_token&quot;</code></p></td></tr>
+<tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;token&quot;,
+    &quot;client_id&quot;,
+    &quot;client_secret&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;token&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Token de acceso o de renovación de la sesión que se cierra.&quot;
+    },
+    &quot;token_type_hint&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;access_token&quot;,
+        &quot;refresh_token&quot;
+      ]
+    },
+    &quot;client_id&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;client_secret&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    }
+  }
+}</pre>
+</details>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;token&quot;: &quot;token-de-acceso-de-ejemplo&quot;,
+  &quot;token_type_hint&quot;: &quot;access_token&quot;,
+  &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
+  &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Token revocado.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-NoDocumentada"><code>NoDocumentada</code></a></p>
+<p class="rotulo">Ejemplo <code>cuerpoNoDocumentado</code>: Cuerpo no documentado por el Sistema. La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.</p>
+<pre class="ejemplo">{}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-renovarToken" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/oauth2/token/</code></h4>
+<p class="resumen">Renovar el token de acceso con el token de renovación</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>renovarToken</code></dd>
+<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-origen</code></dt><dd><code>context/AuthProvider.js</code>, <code>slices/servicios/usuarios.js</code></dd>
+<dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
+</dl>
+<p>Propuesta de la app para la 1.10.3: cuando una ruta del API contesta 401 a una petición con el Bearer de la sesión, la app pide aquí un token de acceso nuevo con el <code>refresh_token</code> del inicio de sesión (flujo <code>refresh_token</code> de OAuth2) y repite la petición una vez con él. Todas las peticiones que reciban 401 mientras tanto esperan a esa misma renovación. La ruta no figura en la documentación del API: se da por hecha porque es la de emisión de tokens del mismo servicio OAuth2 que atiende <code>/oauth2/revoke_token/</code>, y el Sistema debe confirmar dónde está montada y qué responde. La app la llama con URL absoluta y sin Bearer, en un formulario con el mismo par de cliente que el inicio de sesión. Si la respuesta trae un <code>refresh_token</code> nuevo, la app lo guarda en lugar del anterior; si no, conserva el anterior. Cualquier respuesta de error (400 <code>invalid_grant</code>, 401 <code>invalid_client</code>, un 404 si la ruta no existe) cierra la sesión como antes de existir la renovación; si no hay respuesta (sin red, límite de espera agotado), la sesión sigue abierta y la petición original falla con su 401 (<code>renovarToken</code>, <code>slices/servicios/usuarios.js</code>; <code>slices/apiClient.js</code>).</p>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/x-www-form-urlencoded</code></p>
+<p>Esquema en línea: <code>object</code></p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>grant_type</code></td><td><code>string</code></td><td>sí</td><td><p class="reglas">valores: <code>&quot;refresh_token&quot;</code></p></td></tr>
+<tr><td><code>refresh_token</code></td><td><code>string</code></td><td>sí</td><td><p>Token de renovación que entregó el inicio de sesión o la última renovación.</p></td></tr>
+<tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;grant_type&quot;,
+    &quot;refresh_token&quot;,
+    &quot;client_id&quot;,
+    &quot;client_secret&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;grant_type&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;refresh_token&quot;
+      ]
+    },
+    &quot;refresh_token&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Token de renovación que entregó el inicio de sesión o la última renovación.&quot;
+    },
+    &quot;client_id&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;client_secret&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    }
+  }
+}</pre>
+</details>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;grant_type&quot;: &quot;refresh_token&quot;,
+  &quot;refresh_token&quot;: &quot;token-de-refresco-de-ejemplo&quot;,
+  &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
+  &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Token renovado. La app lee <code>access_token</code> y, si viene, <code>refresh_token</code>; una respuesta sin <code>access_token</code> cuenta como rechazo.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-OAuth2"><code>OAuth2</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;access_token&quot;: &quot;token-de-acceso-renovado-de-ejemplo&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 36000,
+  &quot;refresh_token&quot;: &quot;token-de-refresco-renovado-de-ejemplo&quot;,
+  &quot;scope&quot;: &quot;read write&quot;
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> Token de renovación rechazado (vencido, revocado o ya usado). La app cierra la sesión.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ErrorOAuth2"><code>ErrorOAuth2</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;error&quot;: &quot;invalid_grant&quot;,
+  &quot;error_description&quot;: &quot;Invalid refresh token&quot;
+}</pre>
+</div>
+</section>
+<section id="op-registrarUsuario" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/usuarios</code></h4>
+<p class="resumen">Registro de una cuenta nueva</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>registrarUsuario</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/auth/Signup.js</code></dd>
+<dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
+</dl>
+<p>La app llama a la ruta con barra final (<code>/usuarios/</code>). La respuesta se da por buena si trae <code>id</code>; a continuación la app inicia sesión con <code>/login/</code>. Un 400 llega con mensajes por campo (por ejemplo <code>user.username</code> con la lista de errores); si el correo ya existe, la app lo explica, porque el Sistema conserva el usuario de autenticación de las cuentas eliminadas.</p>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Registro"><code>Registro</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
+  &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;,
+  &quot;user&quot;: {
+    &quot;username&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+    &quot;password&quot;: &quot;contraseña-de-ejemplo&quot;
+  },
+  &quot;nombres&quot;: &quot;Persona&quot;,
+  &quot;apellidos&quot;: &quot;De Ejemplo&quot;,
+  &quot;email&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+  &quot;identificacion&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+  &quot;tipo_identificacion&quot;: &quot;CODIGO&quot;,
+  &quot;genero&quot;: &quot;ND&quot;,
+  &quot;rango_edad&quot;: &quot;14-28&quot;,
+  &quot;fecha_nacimiento&quot;: &quot;2003-05-14&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="201">
+<p class="titulo-respuesta"><span class="codigo">201</span> Cuenta creada.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Usuario"><code>Usuario</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 1024,
+  &quot;nombres&quot;: &quot;Persona&quot;,
+  &quot;apellidos&quot;: &quot;De Ejemplo&quot;,
+  &quot;email&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+  &quot;telefono&quot;: &quot;3000000000&quot;,
+  &quot;fecha_nacimiento&quot;: &quot;2003-05-14&quot;,
+  &quot;genero&quot;: &quot;ND&quot;,
+  &quot;municipio&quot;: 7,
+  &quot;grupo_piraguero&quot;: 12,
+  &quot;flags&quot;: {
+    &quot;mide_lluvia&quot;: true,
+    &quot;gestor_limnigrafico&quot;: false,
+    &quot;gestor_pluviografico&quot;: false,
+    &quot;gestor_geografico&quot;: false,
+    &quot;integrante&quot;: true
+  },
+  &quot;empresa&quot;: null
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+</div>
+</section>
+<section id="op-recuperarContrasena" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/forgot-password</code></h4>
+<p class="resumen">Contraseña temporal por correo</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>recuperarContrasena</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/auth/Forgot.js</code></dd>
+<dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
+</dl>
+<p>Recibe el correo como <code>username</code> junto con las credenciales del cliente. La app da la solicitud por aceptada cuando la respuesta trae <code>ok</code>; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse.</p>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema en línea: <code>object</code></p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>username</code></td><td><code>string</code> (email)</td><td>sí</td><td><p>Correo de la cuenta, en minúsculas.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;client_id&quot;,
+    &quot;client_secret&quot;,
+    &quot;username&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;client_id&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;client_secret&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;username&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;email&quot;,
+      &quot;description&quot;: &quot;Correo de la cuenta, en minúsculas.&quot;
+    }
+  }
+}</pre>
+</details>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
+  &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;,
+  &quot;username&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Solicitud aceptada.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema en línea: <code>object</code></p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>ok</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;ok&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  }
+}</pre>
+</details>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;ok&quot;: true
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+</div>
+<div id="etiqueta-usuario" class="grupo">
+<h3>usuario</h3>
+<p>Perfil, grupo piragüero y eliminación de la cuenta.</p>
+<section id="op-actualizarUsuario" class="operacion">
+<h4><span class="metodo metodo-patch">PATCH</span> <code class="ruta">/usuarios/{id}</code></h4>
+<p class="resumen">Actualizar el perfil</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>actualizarUsuario</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/user/UserEdit.js</code>, <code>screens/user/Grupo.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Actualización parcial. <code>screens/user/UserEdit.js</code> envía empresa, banderas, teléfono, grupo piragüero, municipio y, si se cambió, <code>user.password</code>; <code>screens/user/Grupo.js</code> envía solo <code>municipio</code> y <code>grupo_piraguero</code>. La respuesta es el usuario actualizado (la app comprueba <code>id</code>) y se vuelve a guardar en el teléfono con el <code>oauth2</code> que ya tenía.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-UsuarioParcial"><code>UsuarioParcial</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;empresa&quot;: {
+    &quot;contacto_principal&quot;: &quot;Contacto de ejemplo&quot;,
+    &quot;direccion&quot;: &quot;Calle 1 # 2-3&quot;,
+    &quot;razon_social&quot;: &quot;Empresa de ejemplo&quot;
+  },
+  &quot;flags&quot;: {
+    &quot;mide_lluvia&quot;: true,
+    &quot;gestor_limnigrafico&quot;: false,
+    &quot;gestor_pluviografico&quot;: false,
+    &quot;gestor_geografico&quot;: false,
+    &quot;integrante&quot;: true
+  },
+  &quot;telefono&quot;: &quot;3000000000&quot;,
+  &quot;grupo_piraguero&quot;: 12,
+  &quot;municipio&quot;: 7,
+  &quot;user&quot;: {
+    &quot;password&quot;: &quot;contraseña-nueva-de-ejemplo&quot;
+  }
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Perfil actualizado.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Usuario"><code>Usuario</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 1024,
+  &quot;nombres&quot;: &quot;Persona&quot;,
+  &quot;apellidos&quot;: &quot;De Ejemplo&quot;,
+  &quot;email&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+  &quot;telefono&quot;: &quot;3000000000&quot;,
+  &quot;fecha_nacimiento&quot;: &quot;2003-05-14&quot;,
+  &quot;genero&quot;: &quot;ND&quot;,
+  &quot;municipio&quot;: 7,
+  &quot;grupo_piraguero&quot;: 12,
+  &quot;flags&quot;: {
+    &quot;mide_lluvia&quot;: true,
+    &quot;gestor_limnigrafico&quot;: false,
+    &quot;gestor_pluviografico&quot;: false,
+    &quot;gestor_geografico&quot;: false,
+    &quot;integrante&quot;: true
+  },
+  &quot;empresa&quot;: {
+    &quot;contacto_principal&quot;: &quot;Contacto de ejemplo&quot;,
+    &quot;nombre_comercial&quot;: &quot;Empresa de ejemplo&quot;,
+    &quot;direccion&quot;: &quot;Calle 1 # 2-3&quot;
+  }
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+</div>
+</section>
+<section id="op-eliminarCuenta" class="operacion">
+<h4><span class="metodo metodo-delete">DELETE</span> <code class="ruta">/usuarios/{id}</code></h4>
+<p class="resumen">Eliminar la cuenta</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>eliminarCuenta</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/userActions.js</code>, <code>screens/user/EliminarCuenta.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Elimina los datos personales y conserva, anonimizados, los registros de monitoreo aportados al Programa; esa semántica la define el Sistema. Tras el éxito la app cierra la sesión local. Ruta base en <code>ELIMINAR_CUENTA_PATH</code> (<code>slices/constants.js</code>).</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Cuenta eliminada.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-NoDocumentada"><code>NoDocumentada</code></a></p>
+<p class="rotulo">Ejemplo <code>cuerpoNoDocumentado</code>: Cuerpo no documentado por el Sistema. La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.</p>
+<pre class="ejemplo">{}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-listarGruposPiragueros" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/grupos-piragueros</code></h4>
+<p class="resumen">Grupos piragüeros</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarGruposPiragueros</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/user/Grupo.js</code>, <code>screens/user/UserEdit.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>municipio</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Identificador del municipio para filtrar los grupos.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada de grupos.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeGrupos"><code>ListaDeGrupos</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 2,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 12,
+      &quot;nombre&quot;: &quot;Grupo piragüero de ejemplo&quot;,
+      &quot;codigo&quot;: &quot;GP-012&quot;,
+      &quot;tipo_nombre&quot;: &quot;Grupo de monitoreo comunitario&quot;,
+      &quot;descripcion&quot;: &quot;Grupo que mide la lluvia y observa la quebrada La Clara.&quot;
+    },
+    {
+      &quot;id&quot;: 13,
+      &quot;nombre&quot;: null,
+      &quot;codigo&quot;: &quot;GP-013&quot;,
+      &quot;tipo_nombre&quot;: &quot;Institución educativa&quot;,
+      &quot;descripcion&quot;: &quot;Escuela rural vinculada al Programa.&quot;
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+</div>
+<div id="etiqueta-estaciones" class="grupo">
+<h3>estaciones</h3>
+<p>Estación meteorológica más cercana y clima del día (pantalla de inicio).</p>
+<section id="op-estacionMasCercana" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/estaciones</code></h4>
+<p class="resumen">Estación meteorológica más cercana</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>estacionMasCercana</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/home/Home.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Con <code>latitud</code>, <code>longitud</code> y <code>tipo=8</code> la respuesta es UNA estación (no una lista): la más cercana a las coordenadas. Las coordenadas viajan truncadas a los decimales que fija la pantalla de inicio, porque quedan escritas en los registros del servidor.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>latitud</code></td><td>query</td><td>sí</td><td><code>number</code></td><td></td></tr>
+<tr><td><code>longitud</code></td><td>query</td><td>sí</td><td><code>number</code></td><td></td></tr>
+<tr><td><code>tipo</code></td><td>query</td><td>sí</td><td><code>integer</code></td><td><p>La app envía siempre <code>8</code> (estación meteorológica).</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> La app lee <code>codigo</code>, <code>municipio</code>, <code>fuente</code> y <code>ubicacion</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Estacion"><code>Estacion</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;codigo&quot;: &quot;MET-0101&quot;,
+  &quot;municipio&quot;: 7,
+  &quot;fuente&quot;: &quot;Quebrada La Clara&quot;,
+  &quot;ubicacion&quot;: &quot;Vereda El Cedro&quot;
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-meteorologiaDiaria" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/estaciones/{codigo}/meteorologia/diario</code></h4>
+<p class="resumen">Resumen meteorológico diario de una estación</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>meteorologiaDiaria</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/home/Home.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>La app pide <code>size=1</code> y usa el primer elemento de <code>values</code>; cada magnitud se muestra solo si su bandera <code>calidad_*</code> vale 1.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>codigo</code></td><td>path</td><td>sí</td><td><code>string</code></td><td><p>Código de la estación, tal como lo devuelve <code>/estaciones</code>.</p></td></tr>
+<tr><td><code>size</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Tamaño de página de las listas paginadas.</p><p class="reglas">compartido: <a href="#parametro-size"><code>size</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada de resúmenes diarios.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeMeteorologiaDiaria"><code>ListaDeMeteorologiaDiaria</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 1,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;lluvia&quot;: 4.2,
+      &quot;calidad_lluvia&quot;: 1,
+      &quot;temperatura&quot;: 21.7,
+      &quot;calidad_temperatura&quot;: 1,
+      &quot;humedad_relativa&quot;: 78,
+      &quot;calidad_humedad_relativa&quot;: 1
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+</div>
+<div id="etiqueta-medidores" class="grupo">
+<h3>medidores</h3>
+<p>Estaciones de lluvia del usuario y sus registros de lluvia.</p>
+<section id="op-listarMedidores" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/usuarios/{id}/medidores</code></h4>
+<p class="resumen">Estaciones de lluvia del usuario</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarMedidores</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/stations/Estaciones.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada. La app lee <code>values</code> y de cada elemento <code>id</code>, <code>activo</code>, <code>codigo</code>, <code>ubicacion</code>, <code>latitud</code> y <code>longitud</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeMedidores"><code>ListaDeMedidores</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 2,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 501,
+      &quot;codigo&quot;: &quot;PLV-0501&quot;,
+      &quot;nombre&quot;: &quot;Pluviómetro vereda La Clara&quot;,
+      &quot;ubicacion&quot;: &quot;Vereda La Clara, predio El Recreo&quot;,
+      &quot;activo&quot;: true,
+      &quot;latitud&quot;: 6.2518,
+      &quot;longitud&quot;: -75.5636
+    },
+    {
+      &quot;id&quot;: 502,
+      &quot;codigo&quot;: &quot;PLV-0502&quot;,
+      &quot;nombre&quot;: &quot;Pluviómetro escuela rural&quot;,
+      &quot;ubicacion&quot;: &quot;Escuela rural, sede principal&quot;,
+      &quot;activo&quot;: false,
+      &quot;latitud&quot;: 6.2601,
+      &quot;longitud&quot;: -75.5702
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-crearMedidor" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/usuarios/{id}/medidores</code></h4>
+<p class="resumen">Registrar una estación de lluvia</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>crearMedidor</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/stations/Registroestacion.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>El campo del formulario <code>fuente</code> viaja como <code>predio</code>. Las coordenadas salen del GPS del teléfono con siete decimales y viajan como número; la altitud, redondeada a entero. La estación queda pendiente de aprobación por el Programa.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-MedidorNuevo"><code>MedidorNuevo</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;predio&quot;: &quot;Predio El Recreo&quot;,
+  &quot;ubicacion&quot;: &quot;Vereda La Clara&quot;,
+  &quot;latitud&quot;: 6.2518,
+  &quot;longitud&quot;: -75.5636,
+  &quot;altitud&quot;: 1495,
+  &quot;version_formulario&quot;: &quot;2&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="201">
+<p class="titulo-respuesta"><span class="codigo">201</span> Estación registrada.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Medidor"><code>Medidor</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 503,
+  &quot;codigo&quot;: &quot;PLV-0503&quot;,
+  &quot;nombre&quot;: &quot;Pluviómetro predio El Recreo&quot;,
+  &quot;ubicacion&quot;: &quot;Vereda La Clara&quot;,
+  &quot;activo&quot;: false,
+  &quot;latitud&quot;: 6.2518,
+  &quot;longitud&quot;: -75.5636
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+</div>
+</section>
+<section id="op-listarLluviometros" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/usuarios/{id}/medidores/{medidorId}/registros</code></h4>
+<p class="resumen">Registros de lluvia de una estación</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarLluviometros</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/stations/Detalleestacion.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+<tr><td><code>medidorId</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador de la estación de lluvia del usuario.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada; la app ordena <code>values</code> por <code>fecha</code> descendente.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeLluviometros"><code>ListaDeLluviometros</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 2,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 9002,
+      &quot;fecha&quot;: &quot;2026-09-20T07:00:00&quot;,
+      &quot;muestra&quot;: &quot;12.5&quot;
+    },
+    {
+      &quot;id&quot;: 9001,
+      &quot;fecha&quot;: &quot;2026-09-19T07:00:00&quot;,
+      &quot;muestra&quot;: &quot;0&quot;
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-crearLluviometro" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/usuarios/{id}/medidores/{medidorId}/registros</code></h4>
+<p class="resumen">Guardar un registro de lluvia</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>crearLluviometro</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/stations/Detalleestacion.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+<tr><td><code>medidorId</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador de la estación de lluvia del usuario.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-LluviometroNuevo"><code>LluviometroNuevo</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;fecha&quot;: &quot;2026-09-20 07:00&quot;,
+  &quot;muestra&quot;: &quot;12.5&quot;,
+  &quot;observacion&quot;: &quot;Aguacero corto en la madrugada.&quot;,
+  &quot;version_formulario&quot;: &quot;1&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Registro guardado; la app comprueba <code>id</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Lluviometro"><code>Lluviometro</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 9002,
+  &quot;fecha&quot;: &quot;2026-09-20T07:00:00&quot;,
+  &quot;muestra&quot;: &quot;12.5&quot;
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+</div>
+</section>
+</div>
+<div id="etiqueta-contenido" class="grupo">
+<h3>contenido</h3>
+<p>Noticias, actividades, documentos, multimedia y preguntas frecuentes.</p>
+<section id="op-listarFavoritos" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/usuarios/{id}/favoritos</code></h4>
+<p class="resumen">Actividades marcadas como favoritas</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarFavoritos</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/tabs/Events.js</code>, <code>screens/tabs/Favoritos.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada; cada elemento trae <code>actividad</code> con el identificador de la actividad.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeFavoritos"><code>ListaDeFavoritos</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 1,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 77,
+      &quot;actividad&quot;: 310
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-crearFavorito" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/usuarios/{id}/favoritos</code></h4>
+<p class="resumen">Marcar una actividad como favorita</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>crearFavorito</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/tabs/Events.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-FavoritoNuevo"><code>FavoritoNuevo</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;actividad&quot;: 310
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="201">
+<p class="titulo-respuesta"><span class="codigo">201</span> Favorito creado; la app comprueba <code>id</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Favorito"><code>Favorito</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 77,
+  &quot;actividad&quot;: 310
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-eliminarFavorito" class="operacion">
+<h4><span class="metodo metodo-delete">DELETE</span> <code class="ruta">/usuarios/{id}/favoritos</code></h4>
+<p class="resumen">Retirar una actividad de favoritos</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>eliminarFavorito</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/tabs/Events.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>El identificador de la actividad viaja en el cuerpo de la petición DELETE, no en la ruta.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-FavoritoNuevo"><code>FavoritoNuevo</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;actividad&quot;: 310
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Favorito retirado.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-NoDocumentada"><code>NoDocumentada</code></a></p>
+<p class="rotulo">Ejemplo <code>cuerpoNoDocumentado</code>: Cuerpo no documentado por el Sistema. La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.</p>
+<pre class="ejemplo">{}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-listarMunicipios" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/municipios</code></h4>
+<p class="resumen">Catálogo de municipios</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarMunicipios</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>context/MunicipiosProvider.js</code>, <code>screens/drawer/Notifications.js</code>, <code>screens/user/UserEdit.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Se carga al arrancar la app (<code>context/MunicipiosProvider.js</code>), con o sin sesión. Con sesión activa el cliente HTTP adjunta el Bearer; la ruta responde igual sin él.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>simple</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>La app siempre envía <code>1</code> para recibir solo identificador y nombre.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada de municipios.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeMunicipios"><code>ListaDeMunicipios</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 2,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 7,
+      &quot;nombre&quot;: &quot;Municipio de ejemplo&quot;
+    },
+    {
+      &quot;id&quot;: 8,
+      &quot;nombre&quot;: &quot;Otro municipio de ejemplo&quot;
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-obtenerMunicipio" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/municipios/{id}</code></h4>
+<p class="resumen">Un municipio</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>obtenerMunicipio</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/home/Home.js</code>, <code>screens/observatorio/Detalleobs.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del municipio.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> La app lee <code>nombre</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Municipio"><code>Municipio</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 7,
+  &quot;nombre&quot;: &quot;Municipio de ejemplo&quot;
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-listarNoticias" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/noticias</code></h4>
+<p class="resumen">Noticias del Programa</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarNoticias</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/home/Home.js</code>, <code>screens/home/Newsletter.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>size</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Tamaño de página de las listas paginadas.</p><p class="reglas">compartido: <a href="#parametro-size"><code>size</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada; la app pide <code>size=10</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeNoticias"><code>ListaDeNoticias</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 1,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 12,
+      &quot;titulo&quot;: &quot;Jornada de monitoreo comunitario&quot;,
+      &quot;imagen&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/noticias/jornada.jpg&quot;
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-listarActividades" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/actividades</code></h4>
+<p class="resumen">Cursos y eventos</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarActividades</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/tabs/Events.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>La pantalla de actividades hace tres llamadas seguidas: por año, por año y mes, y por año, mes y semana. Separa los elementos por <code>tipo</code> (<code>Evento</code> frente al resto).</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>year</code></td><td>query</td><td>sí</td><td><code>integer</code></td><td></td></tr>
+<tr><td><code>month</code></td><td>query</td><td>no</td><td><code>integer</code></td><td></td></tr>
+<tr><td><code>week</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Semana del año calculada por la app.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada de actividades.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeActividades"><code>ListaDeActividades</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 2,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 310,
+      &quot;tipo&quot;: &quot;Evento&quot;,
+      &quot;title&quot;: &quot;Encuentro de piragüeros&quot;,
+      &quot;imagen&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/actividades/encuentro.jpg&quot;,
+      &quot;url&quot;: &quot;https://piragua.corantioquia.gov.co/actividades/310&quot;
+    },
+    {
+      &quot;id&quot;: 311,
+      &quot;tipo&quot;: &quot;Curso&quot;,
+      &quot;title&quot;: &quot;Curso de medición de lluvia&quot;,
+      &quot;imagen&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/actividades/curso.jpg&quot;,
+      &quot;url&quot;: &quot;https://piragua.corantioquia.gov.co/actividades/311&quot;
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-listarMultimedia" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/multimedias</code></h4>
+<p class="resumen">Imágenes y videos del portal</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarMultimedia</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/tabs/Multimedia.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>size</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Tamaño de página de las listas paginadas.</p><p class="reglas">compartido: <a href="#parametro-size"><code>size</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada; la app pide <code>size=100</code>. El tipo va en cada archivo (<code>archivos[].tipo</code>, <code>Imagen</code> o <code>Video</code>) y la app lo lee sin distinguir mayúsculas: una pieza con algún <code>Video</code> se reproduce; la miniatura es su imagen principal.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeMultimedia"><code>ListaDeMultimedia</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 2,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 90,
+      &quot;titulo&quot;: &quot;Aprendemos juntos&quot;,
+      &quot;componente&quot;: 5,
+      &quot;resumen&quot;: &quot;Pieza gráfica de la campaña de lluvias.&quot;,
+      &quot;activo&quot;: true,
+      &quot;archivos&quot;: [
+        {
+          &quot;id&quot;: 46,
+          &quot;tipo&quot;: &quot;Imagen&quot;,
+          &quot;archivo&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/app/multimedia/aprendemos-juntos.png&quot;,
+          &quot;es_principal&quot;: true
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: 58,
+      &quot;titulo&quot;: &quot;Cómo registrar la lluvia&quot;,
+      &quot;componente&quot;: 5,
+      &quot;resumen&quot;: &quot;Video corto del registro diario.&quot;,
+      &quot;activo&quot;: true,
+      &quot;archivos&quot;: [
+        {
+          &quot;id&quot;: 5,
+          &quot;tipo&quot;: &quot;Video&quot;,
+          &quot;archivo&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/app/multimedia/registrar-lluvia.mp4&quot;,
+          &quot;es_principal&quot;: true
+        }
+      ]
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-listarDocumentos" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/documentos</code></h4>
+<p class="resumen">Documentos del Programa</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarDocumentos</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/tabs/Multimedia.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Documentos que el Programa publica para descargar. No traen <code>id</code> y <code>tipo</code> vale <code>DOCUMENTO</code>. <code>archivo</code> es el documento, que abre «DESCÁRGALO», y <code>portada</code> su carátula, que la app pinta como miniatura. La especificación no declara paginación; la app pide <code>size=100</code>, igual que en <code>/multimedias</code>, donde el API sí pagina. Si esta ruta falla, la pestaña sigue mostrando la multimedia.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>size</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Tamaño de página de las listas paginadas.</p><p class="reglas">compartido: <a href="#parametro-size"><code>size</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista de documentos, en <code>values</code>.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeDocumentos"><code>ListaDeDocumentos</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;values&quot;: [
+    {
+      &quot;titulo&quot;: &quot;Guía del pluviómetro&quot;,
+      &quot;descripcion&quot;: &quot;&lt;p&gt;Cómo instalar el pluviómetro y leer la lluvia del día.&lt;/p&gt;&quot;,
+      &quot;tipo&quot;: &quot;DOCUMENTO&quot;,
+      &quot;archivo&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/app/documentacion/guia-pluviometro.pdf&quot;,
+      &quot;portada&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/app/documentacion/guia-pluviometro.webp&quot;
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-listarPreguntasFrecuentes" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/faqs</code></h4>
+<p class="resumen">Preguntas frecuentes</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarPreguntasFrecuentes</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>screens/drawer/Questions.js</code></dd>
+<dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
+</dl>
+<p class="aviso">Esta ruta va a otro servidor:</p>
+<ul class="servidores">
+<li><code>https://piragua.corantioquia.gov.co/api/v1</code> · Portal del Programa. Es otro host: el cliente HTTP atiende la URL absoluta sin adjuntar el Bearer y sin que un 401 cierre la sesión.</li>
+</ul>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada; la app filtra por <code>topics</code> (<code>CONOCENOS</code> o <code>VINCULACION</code>).</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDePreguntas"><code>ListaDePreguntas</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 2,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 3,
+      &quot;pregunta&quot;: &quot;¿Qué es Piragua?&quot;,
+      &quot;respuesta&quot;: &quot;Programa integral de red de agua de Corantioquia.&quot;,
+      &quot;topics&quot;: &quot;CONOCENOS&quot;
+    },
+    {
+      &quot;id&quot;: 4,
+      &quot;pregunta&quot;: &quot;¿Cómo me vinculo?&quot;,
+      &quot;respuesta&quot;: &quot;Registra tu cuenta en la app y elige tu grupo piragüero.&quot;,
+      &quot;topics&quot;: &quot;VINCULACION&quot;
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+</div>
+<div id="etiqueta-observatorios" class="grupo">
+<h3>observatorios</h3>
+<p>Observaciones de campo. El flujo no tiene entrada en el menú.</p>
+<section id="op-listarObservatorios" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/observatorios</code></h4>
+<p class="resumen">Observaciones de campo</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>listarObservatorios</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/observatorio.js</code>, <code>screens/observatorio/Listadoobs.js</code>, <code>screens/observatorio/Detalleobs.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Lo llama <code>listarObservaciones</code> (<code>slices/observatorio.js</code>) con <code>page</code> y <code>size</code>. El API responde hoy con <code>values</code> sin paginar; si un día pagina, <code>count</code>, <code>next</code> y <code>previous</code> pasan tal cual.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>page</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Página, desde 1.</p></td></tr>
+<tr><td><code>size</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Observaciones por página; la app pide 50.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Lista paginada; la forma de cada elemento no está documentada.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ListaDeObservatorios"><code>ListaDeObservatorios</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;count&quot;: 1,
+  &quot;next&quot;: null,
+  &quot;previous&quot;: null,
+  &quot;values&quot;: [
+    {
+      &quot;id&quot;: 88,
+      &quot;fecha&quot;: &quot;2026-09-20&quot;,
+      &quot;categoria&quot;: &quot;Fauna&quot;,
+      &quot;tipo&quot;: &quot;Avistamiento&quot;,
+      &quot;actividad&quot;: &quot;Recorrido de monitoreo&quot;,
+      &quot;descripcion&quot;: &quot;Garza observada en la orilla de la quebrada La Clara.&quot;,
+      &quot;altitud&quot;: &quot;1495&quot;,
+      &quot;latitud&quot;: &quot;6.2518&quot;,
+      &quot;longitud&quot;: &quot;-75.5636&quot;,
+      &quot;foto&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/observatorios/88.jpg&quot;,
+      &quot;municipio&quot;: 7
+    }
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-crearObservatorio" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/observatorios</code></h4>
+<p class="resumen">Registrar una observación con fotografía</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>crearObservatorio</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/observatorio.js</code>, <code>screens/observatorio/Registroobs.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Única llamada multipart de la app: <code>crearObservacion</code> (<code>slices/observatorio.js</code>) envía el <code>FormData</code> armado por el formulario a través del cliente HTTP unificado, que añade el Bearer. La observación queda pendiente de aprobación por el Programa; la app comprueba <code>id</code> en la respuesta. El API solo exige <code>fecha</code>, <code>municipio</code>, <code>categoria</code>, <code>tipo</code> y <code>actividad</code>; la app exige además una <code>descripcion</code> de al menos 10 caracteres, sin contar los espacios de los extremos, y la <code>foto</code>, y sin ellas no envía la observación (<code>validarObservacion</code>, <code>slices/observatorio.js</code>). Es un criterio de la app, no del API: la descripción mínima cuida la calidad del dato y la foto es la evidencia visual de lo observado.</p>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>multipart/form-data</code></p>
+<p>Esquema: <a href="#esquema-ObservatorioNuevo"><code>ObservatorioNuevo</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;fecha&quot;: &quot;2026-09-20&quot;,
+  &quot;categoria&quot;: &quot;Fauna&quot;,
+  &quot;tipo&quot;: &quot;Avistamiento&quot;,
+  &quot;actividad&quot;: &quot;Recorrido de monitoreo&quot;,
+  &quot;descripcion&quot;: &quot;Garza observada en la orilla de la quebrada La Clara.&quot;,
+  &quot;altitud&quot;: &quot;1495&quot;,
+  &quot;latitud&quot;: &quot;6.2518&quot;,
+  &quot;longitud&quot;: &quot;-75.5636&quot;,
+  &quot;foto&quot;: &quot;observacion.jpg&quot;,
+  &quot;municipio&quot;: 7
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="201">
+<p class="titulo-respuesta"><span class="codigo">201</span> Observación registrada.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Observatorio"><code>Observatorio</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 88,
+  &quot;fecha&quot;: &quot;2026-09-20&quot;,
+  &quot;categoria&quot;: &quot;Fauna&quot;,
+  &quot;tipo&quot;: &quot;Avistamiento&quot;,
+  &quot;actividad&quot;: &quot;Recorrido de monitoreo&quot;,
+  &quot;descripcion&quot;: &quot;Garza observada en la orilla de la quebrada La Clara.&quot;,
+  &quot;altitud&quot;: &quot;1495&quot;,
+  &quot;latitud&quot;: &quot;6.2518&quot;,
+  &quot;longitud&quot;: &quot;-75.5636&quot;,
+  &quot;foto&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/observatorios/88.jpg&quot;,
+  &quot;municipio&quot;: 7
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+</div>
+</section>
+<section id="op-obtenerObservatorio" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/observatorios/{id}</code></h4>
+<p class="resumen">Detalle de una observación</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>obtenerObservatorio</code></dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/observatorio.js</code></dd>
+<dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Lo consume el servicio de observatorios de la 1.10.2 (<code>slices/observatorio.js</code>). La forma de la respuesta no está documentada.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador de la observación.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Una observación.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Observatorio"><code>Observatorio</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 88,
+  &quot;fecha&quot;: &quot;2026-09-20&quot;,
+  &quot;categoria&quot;: &quot;Fauna&quot;,
+  &quot;tipo&quot;: &quot;Avistamiento&quot;,
+  &quot;actividad&quot;: &quot;Recorrido de monitoreo&quot;,
+  &quot;descripcion&quot;: &quot;Garza observada en la orilla de la quebrada La Clara.&quot;,
+  &quot;altitud&quot;: &quot;1495&quot;,
+  &quot;latitud&quot;: &quot;6.2518&quot;,
+  &quot;longitud&quot;: &quot;-75.5636&quot;,
+  &quot;foto&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/observatorios/88.jpg&quot;,
+  &quot;municipio&quot;: 7
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+</div>
+<div id="etiqueta-notificaciones" class="grupo">
+<h3>notificaciones</h3>
+<p>Registro del dispositivo y umbrales de alerta. Contrato propuesto por la app para la 1.10.2.</p>
+<section id="op-registrarDispositivo" class="operacion">
+<h4><span class="metodo metodo-post">POST</span> <code class="ruta">/dispositivos</code></h4>
+<p class="resumen">Registrar el dispositivo que recibe notificaciones</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>registrarDispositivo</code></dd>
+<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/notificaciones.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Propuesta de la app para la 1.10.2: tras obtener el token de notificaciones de Expo, la app lo asocia a la cuenta para que el Sistema le envíe las alertas de umbrales a través del servicio de notificaciones de Expo. Ruta en <code>DISPOSITIVOS_PATH</code> (<code>slices/constants.js</code>). El Sistema debe confirmar ruta, método y forma.</p>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Dispositivo"><code>Dispositivo</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;token&quot;: &quot;ExponentPushToken[ejemplo000000000000000]&quot;,
+  &quot;plataforma&quot;: &quot;android&quot;,
+  &quot;version_app&quot;: &quot;1.10.2&quot;,
+  &quot;modelo&quot;: &quot;Modelo de ejemplo&quot;,
+  &quot;so&quot;: &quot;Android 14&quot;
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Dispositivo registrado. La app acepta 200 o 201 y lee <code>id</code> si viene.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-DispositivoRegistrado"><code>DispositivoRegistrado</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 7
+}</pre>
+</div>
+<div class="respuesta" data-codigo="201">
+<p class="titulo-respuesta"><span class="codigo">201</span> Dispositivo registrado.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-DispositivoRegistrado"><code>DispositivoRegistrado</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;id&quot;: 7
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-eliminarDispositivo" class="operacion">
+<h4><span class="metodo metodo-delete">DELETE</span> <code class="ruta">/dispositivos/{token}</code></h4>
+<p class="resumen">Dar de baja el dispositivo</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>eliminarDispositivo</code></dd>
+<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/notificaciones.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Propuesta de la app para la 1.10.2: al cerrar sesión o desactivar las alertas, el token deja de recibir notificaciones. El Sistema debe confirmar ruta, método y forma.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>token</code></td><td>path</td><td>sí</td><td><code>string</code></td><td><p>Token de notificaciones de Expo registrado con <code>POST /dispositivos</code>.</p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Dispositivo dado de baja.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-NoDocumentada"><code>NoDocumentada</code></a></p>
+<p class="rotulo">Ejemplo <code>cuerpoNoDocumentado</code>: Cuerpo no documentado por el Sistema. La app no lee ninguna clave de esta respuesta; solo comprueba el estado HTTP.</p>
+<pre class="ejemplo">{}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-obtenerUmbrales" class="operacion">
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/usuarios/{id}/umbrales</code></h4>
+<p class="resumen">Umbrales de alerta del usuario</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>obtenerUmbrales</code></dd>
+<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/notificaciones.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Propuesta de la app para la 1.10.2. Ruta en <code>UMBRALES_PATH(usuarioId)</code> (<code>slices/constants.js</code>). La app guarda una copia local de los umbrales y encola los cambios hechos sin conexión. El Sistema debe confirmar ruta, método y forma.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Umbrales vigentes.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Umbrales"><code>Umbrales</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;municipios&quot;: [
+    7,
+    8
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+</div>
+</section>
+<section id="op-guardarUmbrales" class="operacion">
+<h4><span class="metodo metodo-put">PUT</span> <code class="ruta">/usuarios/{id}/umbrales</code></h4>
+<p class="resumen">Guardar los umbrales de alerta del usuario</p>
+<dl class="datos">
+<dt>operationId</dt><dd><code>guardarUmbrales</code></dd>
+<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-origen</code></dt><dd><code>slices/notificaciones.js</code></dd>
+<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+</dl>
+<p>Propuesta de la app para la 1.10.2: reemplaza el conjunto de umbrales. Es la operación que la cola de sincronización reenvía cuando vuelve la conexión. El Sistema debe confirmar ruta, método y forma.</p>
+<h5>Parámetros</h5>
+<div class="tabla">
+<table>
+<thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td>path</td><td>sí</td><td><code>integer</code></td><td><p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p><p class="reglas">compartido: <a href="#parametro-usuarioId"><code>usuarioId</code></a></p></td></tr>
+</tbody>
+</table>
+</div>
+<h5>Cuerpo de la petición</h5>
+<p>Obligatorio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Umbrales"><code>Umbrales</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;municipios&quot;: [
+    7,
+    8
+  ]
+}</pre>
+<h5>Respuestas</h5>
+<div class="respuesta" data-codigo="200">
+<p class="titulo-respuesta"><span class="codigo">200</span> Umbrales guardados.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Umbrales"><code>Umbrales</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;municipios&quot;: [
+    7,
+    8
+  ]
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="401">
+<p class="titulo-respuesta"><span class="codigo">401</span> respuesta compartida <a href="#respuesta-NoAutorizado"><code>NoAutorizado</code></a></p>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+</div>
+<div class="respuesta error" data-codigo="4XX">
+<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+</div>
+</section>
+</div>
+</div>
+<div id="esquemas">
+<h2>Esquemas</h2>
+<p><a href="#esquema-NoDocumentada"><code>NoDocumentada</code></a> · <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a> · <a href="#esquema-Error"><code>Error</code></a> · <a href="#esquema-ErrorDeValidacion"><code>ErrorDeValidacion</code></a> · <a href="#esquema-ErrorOAuth2"><code>ErrorOAuth2</code></a> · <a href="#esquema-Credenciales"><code>Credenciales</code></a> · <a href="#esquema-OAuth2"><code>OAuth2</code></a> · <a href="#esquema-Sesion"><code>Sesion</code></a> · <a href="#esquema-Usuario"><code>Usuario</code></a> · <a href="#esquema-Banderas"><code>Banderas</code></a> · <a href="#esquema-Registro"><code>Registro</code></a> · <a href="#esquema-UsuarioParcial"><code>UsuarioParcial</code></a> · <a href="#esquema-Municipio"><code>Municipio</code></a> · <a href="#esquema-ListaDeMunicipios"><code>ListaDeMunicipios</code></a> · <a href="#esquema-Estacion"><code>Estacion</code></a> · <a href="#esquema-MeteorologiaDiaria"><code>MeteorologiaDiaria</code></a> · <a href="#esquema-ListaDeMeteorologiaDiaria"><code>ListaDeMeteorologiaDiaria</code></a> · <a href="#esquema-Medidor"><code>Medidor</code></a> · <a href="#esquema-MedidorNuevo"><code>MedidorNuevo</code></a> · <a href="#esquema-ListaDeMedidores"><code>ListaDeMedidores</code></a> · <a href="#esquema-Lluviometro"><code>Lluviometro</code></a> · <a href="#esquema-LluviometroNuevo"><code>LluviometroNuevo</code></a> · <a href="#esquema-ListaDeLluviometros"><code>ListaDeLluviometros</code></a> · <a href="#esquema-Favorito"><code>Favorito</code></a> · <a href="#esquema-FavoritoNuevo"><code>FavoritoNuevo</code></a> · <a href="#esquema-ListaDeFavoritos"><code>ListaDeFavoritos</code></a> · <a href="#esquema-Actividad"><code>Actividad</code></a> · <a href="#esquema-ListaDeActividades"><code>ListaDeActividades</code></a> · <a href="#esquema-Noticia"><code>Noticia</code></a> · <a href="#esquema-ListaDeNoticias"><code>ListaDeNoticias</code></a> · <a href="#esquema-Multimedia"><code>Multimedia</code></a> · <a href="#esquema-MultimediaArchivo"><code>MultimediaArchivo</code></a> · <a href="#esquema-ListaDeMultimedia"><code>ListaDeMultimedia</code></a> · <a href="#esquema-Documento"><code>Documento</code></a> · <a href="#esquema-ListaDeDocumentos"><code>ListaDeDocumentos</code></a> · <a href="#esquema-GrupoPiraguero"><code>GrupoPiraguero</code></a> · <a href="#esquema-ListaDeGrupos"><code>ListaDeGrupos</code></a> · <a href="#esquema-Pregunta"><code>Pregunta</code></a> · <a href="#esquema-ListaDePreguntas"><code>ListaDePreguntas</code></a> · <a href="#esquema-Observatorio"><code>Observatorio</code></a> · <a href="#esquema-ObservatorioNuevo"><code>ObservatorioNuevo</code></a> · <a href="#esquema-ListaDeObservatorios"><code>ListaDeObservatorios</code></a> · <a href="#esquema-Dispositivo"><code>Dispositivo</code></a> · <a href="#esquema-DispositivoRegistrado"><code>DispositivoRegistrado</code></a> · <a href="#esquema-Umbrales"><code>Umbrales</code></a></p>
+<section id="esquema-NoDocumentada" class="esquema">
+<h3><code>NoDocumentada</code></h3>
+<p>forma no documentada</p>
+<p>Tipo: <code>object</code>.</p>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;forma no documentada&quot;
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaPaginada" class="esquema">
+<h3><code>ListaPaginada</code></h3>
+<p>Envoltorio de toda lista del API institucional. La app lee <code>values</code>; <code>next</code> y <code>previous</code> son las URL de las páginas contiguas.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>count</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>next</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>previous</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>values</code></td><td>lista de <code>object</code></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Envoltorio de toda lista del API institucional. La app lee `values`; `next` y `previous` son las URL de las páginas contiguas.&quot;,
+  &quot;required&quot;: [
+    &quot;values&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;count&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;next&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;previous&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;values&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;object&quot;
+      }
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-Error" class="esquema">
+<h3><code>Error</code></h3>
+<p>Claves de error que la app sabe leer (<code>slices/userActions.js</code>, <code>slices/mapActions.js</code>). Ninguna es obligatoria.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>detail</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>error</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>errors</code></td><td><code>string</code> o lista de <code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>non_field_errors</code></td><td>lista de <code>string</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Claves de error que la app sabe leer (`slices/userActions.js`, `slices/mapActions.js`). Ninguna es obligatoria.&quot;,
+  &quot;properties&quot;: {
+    &quot;detail&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;error&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;errors&quot;: {
+      &quot;oneOf&quot;: [
+        {
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          }
+        }
+      ]
+    },
+    &quot;non_field_errors&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;
+      }
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ErrorDeValidacion" class="esquema">
+<h3><code>ErrorDeValidacion</code></h3>
+<p>Combina: <a href="#esquema-Error"><code>Error</code></a>, <code>object</code>.</p>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/Error&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: {
+        &quot;oneOf&quot;: [
+          {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: {
+              &quot;type&quot;: &quot;string&quot;
+            }
+          },
+          {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;additionalProperties&quot;: {
+              &quot;type&quot;: &quot;array&quot;,
+              &quot;items&quot;: {
+                &quot;type&quot;: &quot;string&quot;
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-ErrorOAuth2" class="esquema">
+<h3><code>ErrorOAuth2</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>error</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>error_description</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;error&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;error_description&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-Credenciales" class="esquema">
+<h3><code>Credenciales</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td><p>Cliente OAuth2 de la app, inyectado en tiempo de compilación.</p></td></tr>
+<tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>username</code></td><td><code>string</code> (email)</td><td>sí</td><td><p>Correo de la cuenta, en minúsculas.</p></td></tr>
+<tr><td><code>password</code></td><td><code>string</code> (password)</td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;client_id&quot;,
+    &quot;client_secret&quot;,
+    &quot;username&quot;,
+    &quot;password&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;client_id&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Cliente OAuth2 de la app, inyectado en tiempo de compilación.&quot;
+    },
+    &quot;client_secret&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;username&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;email&quot;,
+      &quot;description&quot;: &quot;Correo de la cuenta, en minúsculas.&quot;
+    },
+    &quot;password&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;password&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-OAuth2" class="esquema">
+<h3><code>OAuth2</code></h3>
+<p>Bloque <code>oauth2</code> de la respuesta de <code>/login</code>, y respuesta de <code>/oauth2/token/</code>. La app persiste en la sesión solo <code>access_token</code>; <code>refresh_token</code> lo guarda aparte, cifrado, para renovar el token de acceso; el resto de claves no las lee ningún fichero del árbol.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>access_token</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>token_type</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>expires_in</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>refresh_token</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>scope</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Bloque `oauth2` de la respuesta de `/login`, y respuesta de `/oauth2/token/`. La app persiste en la sesión solo `access_token`; `refresh_token` lo guarda aparte, cifrado, para renovar el token de acceso; el resto de claves no las lee ningún fichero del árbol.&quot;,
+  &quot;required&quot;: [
+    &quot;access_token&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;access_token&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;token_type&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;expires_in&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;refresh_token&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;scope&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-Sesion" class="esquema">
+<h3><code>Sesion</code></h3>
+<p>Combina: <a href="#esquema-Usuario"><code>Usuario</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>oauth2</code></td><td><a href="#esquema-OAuth2"><code>OAuth2</code></a></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/Usuario&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;oauth2&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;oauth2&quot;: {
+          &quot;$ref&quot;: &quot;#/components/schemas/OAuth2&quot;
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Usuario" class="esquema">
+<h3><code>Usuario</code></h3>
+<p>Campos del usuario que alguna pantalla lee (<code>ESQUEMA_DE_SESION</code> en <code>context/sessionStorage.js</code>). El API devuelve más; la app no los persiste.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>nombres</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>apellidos</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>email</code></td><td><code>string</code> (email)</td><td>no</td><td></td></tr>
+<tr><td><code>telefono</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>fecha_nacimiento</code></td><td><code>string</code> (date) o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>genero</code></td><td><code>string</code></td><td>no</td><td><p class="reglas">valores: <code>&quot;HOMBRE&quot;</code>, <code>&quot;MUJER&quot;</code>, <code>&quot;ND&quot;</code></p></td></tr>
+<tr><td><code>municipio</code></td><td><code>integer</code> o <code>null</code></td><td>no</td><td><p>Identificador del municipio.</p></td></tr>
+<tr><td><code>grupo_piraguero</code></td><td><code>integer</code> o <code>null</code></td><td>no</td><td><p>Identificador del grupo piragüero.</p></td></tr>
+<tr><td><code>flags</code></td><td><a href="#esquema-Banderas"><code>Banderas</code></a></td><td>no</td><td></td></tr>
+<tr><td><code>empresa</code></td><td><code>object</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>empresa.contacto_principal</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>empresa.nombre_comercial</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>empresa.direccion</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Campos del usuario que alguna pantalla lee (`ESQUEMA_DE_SESION` en `context/sessionStorage.js`). El API devuelve más; la app no los persiste.&quot;,
+  &quot;required&quot;: [
+    &quot;id&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;nombres&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;apellidos&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;email&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;email&quot;
+    },
+    &quot;telefono&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;fecha_nacimiento&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;date&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;genero&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;HOMBRE&quot;,
+        &quot;MUJER&quot;,
+        &quot;ND&quot;
+      ]
+    },
+    &quot;municipio&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;nullable&quot;: true,
+      &quot;description&quot;: &quot;Identificador del municipio.&quot;
+    },
+    &quot;grupo_piraguero&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;nullable&quot;: true,
+      &quot;description&quot;: &quot;Identificador del grupo piragüero.&quot;
+    },
+    &quot;flags&quot;: {
+      &quot;$ref&quot;: &quot;#/components/schemas/Banderas&quot;
+    },
+    &quot;empresa&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;nullable&quot;: true,
+      &quot;properties&quot;: {
+        &quot;contacto_principal&quot;: {
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;nombre_comercial&quot;: {
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;direccion&quot;: {
+          &quot;type&quot;: &quot;string&quot;
+        }
+      }
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-Banderas" class="esquema">
+<h3><code>Banderas</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>mide_lluvia</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+<tr><td><code>gestor_limnigrafico</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+<tr><td><code>gestor_pluviografico</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+<tr><td><code>gestor_geografico</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+<tr><td><code>integrante</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;mide_lluvia&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    },
+    &quot;gestor_limnigrafico&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    },
+    &quot;gestor_pluviografico&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    },
+    &quot;gestor_geografico&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    },
+    &quot;integrante&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-Registro" class="esquema">
+<h3><code>Registro</code></h3>
+<p>Cuerpo del registro (<code>screens/auth/Signup.js</code>). <code>identificacion</code> lleva el correo y <code>tipo_identificacion</code> vale siempre <code>CODIGO</code>; <code>rango_edad</code> se deriva de la fecha de nacimiento.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>user</code></td><td><code>object</code></td><td>sí</td><td></td></tr>
+<tr><td><code>user.username</code></td><td><code>string</code> (email)</td><td>sí</td><td></td></tr>
+<tr><td><code>user.password</code></td><td><code>string</code> (password)</td><td>sí</td><td></td></tr>
+<tr><td><code>nombres</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>apellidos</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>email</code></td><td><code>string</code> (email)</td><td>sí</td><td></td></tr>
+<tr><td><code>identificacion</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>tipo_identificacion</code></td><td><code>string</code></td><td>sí</td><td><p class="reglas">valores: <code>&quot;CODIGO&quot;</code></p></td></tr>
+<tr><td><code>genero</code></td><td><code>string</code></td><td>sí</td><td><p class="reglas">valores: <code>&quot;HOMBRE&quot;</code>, <code>&quot;MUJER&quot;</code>, <code>&quot;ND&quot;</code></p></td></tr>
+<tr><td><code>rango_edad</code></td><td><code>string</code></td><td>sí</td><td><p>Tramo de edad en años cumplidos que la app calcula con la fecha de nacimiento; sin ella, o con una que no permite calcular la edad, <code>INDETERMINADO</code>. Vocabulario y fuente en <code>docs/vocabulario-rango-edad.md</code>.</p><p class="reglas">valores: <code>&quot;INDETERMINADO&quot;</code>, <code>&quot;0-6&quot;</code>, <code>&quot;7-13&quot;</code>, <code>&quot;14-28&quot;</code>, <code>&quot;29-45&quot;</code>, <code>&quot;46-60&quot;</code>, <code>&quot;MAYOR DE 60&quot;</code></p></td></tr>
+<tr><td><code>fecha_nacimiento</code></td><td><code>string</code> (date)</td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Cuerpo del registro (`screens/auth/Signup.js`). `identificacion` lleva el correo y `tipo_identificacion` vale siempre `CODIGO`; `rango_edad` se deriva de la fecha de nacimiento.&quot;,
+  &quot;required&quot;: [
+    &quot;client_id&quot;,
+    &quot;client_secret&quot;,
+    &quot;user&quot;,
+    &quot;nombres&quot;,
+    &quot;apellidos&quot;,
+    &quot;email&quot;,
+    &quot;identificacion&quot;,
+    &quot;tipo_identificacion&quot;,
+    &quot;genero&quot;,
+    &quot;rango_edad&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;client_id&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;client_secret&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;user&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;username&quot;,
+        &quot;password&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;username&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;format&quot;: &quot;email&quot;
+        },
+        &quot;password&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;format&quot;: &quot;password&quot;
+        }
+      }
+    },
+    &quot;nombres&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;apellidos&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;email&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;email&quot;
+    },
+    &quot;identificacion&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;tipo_identificacion&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;CODIGO&quot;
+      ]
+    },
+    &quot;genero&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;HOMBRE&quot;,
+        &quot;MUJER&quot;,
+        &quot;ND&quot;
+      ]
+    },
+    &quot;rango_edad&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Tramo de edad en años cumplidos que la app calcula con la fecha de nacimiento; sin ella, o con una que no permite calcular la edad, `INDETERMINADO`. Vocabulario y fuente en `docs/vocabulario-rango-edad.md`.&quot;,
+      &quot;enum&quot;: [
+        &quot;INDETERMINADO&quot;,
+        &quot;0-6&quot;,
+        &quot;7-13&quot;,
+        &quot;14-28&quot;,
+        &quot;29-45&quot;,
+        &quot;46-60&quot;,
+        &quot;MAYOR DE 60&quot;
+      ]
+    },
+    &quot;fecha_nacimiento&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;date&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-UsuarioParcial" class="esquema">
+<h3><code>UsuarioParcial</code></h3>
+<p>Cuerpo del PATCH del perfil. Todas las claves son opcionales.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>empresa</code></td><td><code>object</code></td><td>no</td><td></td></tr>
+<tr><td><code>empresa.contacto_principal</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>empresa.direccion</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>empresa.razon_social</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>flags</code></td><td><a href="#esquema-Banderas"><code>Banderas</code></a></td><td>no</td><td></td></tr>
+<tr><td><code>telefono</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>grupo_piraguero</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>municipio</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>user</code></td><td><code>object</code></td><td>no</td><td></td></tr>
+<tr><td><code>user.password</code></td><td><code>string</code> (password)</td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Cuerpo del PATCH del perfil. Todas las claves son opcionales.&quot;,
+  &quot;properties&quot;: {
+    &quot;empresa&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;contacto_principal&quot;: {
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;direccion&quot;: {
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;razon_social&quot;: {
+          &quot;type&quot;: &quot;string&quot;
+        }
+      }
+    },
+    &quot;flags&quot;: {
+      &quot;$ref&quot;: &quot;#/components/schemas/Banderas&quot;
+    },
+    &quot;telefono&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;grupo_piraguero&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;municipio&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;user&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;password&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;format&quot;: &quot;password&quot;
+        }
+      }
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-Municipio" class="esquema">
+<h3><code>Municipio</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>nombre</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;id&quot;,
+    &quot;nombre&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;nombre&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeMunicipios" class="esquema">
+<h3><code>ListaDeMunicipios</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Municipio"><code>Municipio</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Municipio&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Estacion" class="esquema">
+<h3><code>Estacion</code></h3>
+<p>Campos de la estación que lee la pantalla de inicio; el API devuelve más.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>codigo</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>municipio</code></td><td><code>integer</code></td><td>sí</td><td><p>Identificador del municipio; se resuelve con <code>/municipios/{id}</code>.</p></td></tr>
+<tr><td><code>fuente</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>ubicacion</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Campos de la estación que lee la pantalla de inicio; el API devuelve más.&quot;,
+  &quot;required&quot;: [
+    &quot;codigo&quot;,
+    &quot;municipio&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;codigo&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;municipio&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;description&quot;: &quot;Identificador del municipio; se resuelve con `/municipios/{id}`.&quot;
+    },
+    &quot;fuente&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;ubicacion&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-MeteorologiaDiaria" class="esquema">
+<h3><code>MeteorologiaDiaria</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>lluvia</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+<tr><td><code>calidad_lluvia</code></td><td><code>integer</code></td><td>no</td><td><p>1 cuando el dato es válido.</p></td></tr>
+<tr><td><code>temperatura</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+<tr><td><code>calidad_temperatura</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>humedad_relativa</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+<tr><td><code>calidad_humedad_relativa</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;lluvia&quot;: {
+      &quot;type&quot;: &quot;number&quot;
+    },
+    &quot;calidad_lluvia&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;description&quot;: &quot;1 cuando el dato es válido.&quot;
+    },
+    &quot;temperatura&quot;: {
+      &quot;type&quot;: &quot;number&quot;
+    },
+    &quot;calidad_temperatura&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;humedad_relativa&quot;: {
+      &quot;type&quot;: &quot;number&quot;
+    },
+    &quot;calidad_humedad_relativa&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeMeteorologiaDiaria" class="esquema">
+<h3><code>ListaDeMeteorologiaDiaria</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-MeteorologiaDiaria"><code>MeteorologiaDiaria</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/MeteorologiaDiaria&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Medidor" class="esquema">
+<h3><code>Medidor</code></h3>
+<p>Estación de lluvia del usuario. Campos que la app lee (<code>screens/stations/Estaciones.js</code>, <code>screens/stations/Detalleestacion.js</code>); el API devuelve más.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>codigo</code></td><td><code>string</code></td><td>no</td><td><p>Código de la estación; la lista lo muestra en mayúsculas.</p></td></tr>
+<tr><td><code>nombre</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>ubicacion</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>activo</code></td><td><code>boolean</code></td><td>no</td><td><p>Falso mientras el Programa no la habilite; la app la muestra como «Inactiva».</p></td></tr>
+<tr><td><code>latitud</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+<tr><td><code>longitud</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Estación de lluvia del usuario. Campos que la app lee (`screens/stations/Estaciones.js`, `screens/stations/Detalleestacion.js`); el API devuelve más.&quot;,
+  &quot;required&quot;: [
+    &quot;id&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;codigo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Código de la estación; la lista lo muestra en mayúsculas.&quot;
+    },
+    &quot;nombre&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;ubicacion&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;activo&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;,
+      &quot;description&quot;: &quot;Falso mientras el Programa no la habilite; la app la muestra como «Inactiva».&quot;
+    },
+    &quot;latitud&quot;: {
+      &quot;type&quot;: &quot;number&quot;
+    },
+    &quot;longitud&quot;: {
+      &quot;type&quot;: &quot;number&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-MedidorNuevo" class="esquema">
+<h3><code>MedidorNuevo</code></h3>
+<p>Alta de una estación de lluvia tal como la arma <code>screens/stations/Registroestacion.js</code>. Campos obligatorios, rangos y política de versiones en <code>docs/FORMULARIOS.md</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>predio</code></td><td><code>string</code></td><td>sí</td><td><p>Nombre del predio o la fuente; en el formulario se llama <code>fuente</code>.</p></td></tr>
+<tr><td><code>ubicacion</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>latitud</code></td><td><code>number</code></td><td>sí</td><td><p>Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de <code>x-minimo</code> y <code>x-maximo</code>.</p><p class="reglas"><code>x-minimo</code>: <code>-90</code> · <code>x-maximo</code>: <code>90</code> · <code>x-unidad</code>: <code>&quot;grados&quot;</code></p></td></tr>
+<tr><td><code>longitud</code></td><td><code>number</code></td><td>sí</td><td><p>Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de <code>x-minimo</code> y <code>x-maximo</code>.</p><p class="reglas"><code>x-minimo</code>: <code>-180</code> · <code>x-maximo</code>: <code>180</code> · <code>x-unidad</code>: <code>&quot;grados&quot;</code></p></td></tr>
+<tr><td><code>altitud</code></td><td><code>integer</code></td><td>sí</td><td><p>Metros. La pantalla redondea la que se escribe con decimales y no envía el alta sin ella: la especificación del API 1.3.8 la exige.</p><p class="reglas"><code>x-unidad</code>: <code>&quot;metros&quot;</code></p></td></tr>
+<tr><td><code>version_formulario</code></td><td><code>string</code></td><td>no</td><td><p>Versión del formulario que originó el registro: <code>VERSION_FORMULARIO_MEDIDOR</code> de <code>slices/constants.js</code>, que el servicio añade al cuerpo. Se sube según la política de <code>docs/FORMULARIOS.md</code>.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Alta de una estación de lluvia tal como la arma `screens/stations/Registroestacion.js`. Campos obligatorios, rangos y política de versiones en `docs/FORMULARIOS.md`.&quot;,
+  &quot;required&quot;: [
+    &quot;predio&quot;,
+    &quot;ubicacion&quot;,
+    &quot;latitud&quot;,
+    &quot;longitud&quot;,
+    &quot;altitud&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;predio&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Nombre del predio o la fuente; en el formulario se llama `fuente`.&quot;
+    },
+    &quot;ubicacion&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;latitud&quot;: {
+      &quot;type&quot;: &quot;number&quot;,
+      &quot;description&quot;: &quot;Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de `x-minimo` y `x-maximo`.&quot;,
+      &quot;x-minimo&quot;: -90,
+      &quot;x-maximo&quot;: 90,
+      &quot;x-unidad&quot;: &quot;grados&quot;
+    },
+    &quot;longitud&quot;: {
+      &quot;type&quot;: &quot;number&quot;,
+      &quot;description&quot;: &quot;Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de `x-minimo` y `x-maximo`.&quot;,
+      &quot;x-minimo&quot;: -180,
+      &quot;x-maximo&quot;: 180,
+      &quot;x-unidad&quot;: &quot;grados&quot;
+    },
+    &quot;altitud&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;description&quot;: &quot;Metros. La pantalla redondea la que se escribe con decimales y no envía el alta sin ella: la especificación del API 1.3.8 la exige.&quot;,
+      &quot;x-unidad&quot;: &quot;metros&quot;
+    },
+    &quot;version_formulario&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Versión del formulario que originó el registro: `VERSION_FORMULARIO_MEDIDOR` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`.&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeMedidores" class="esquema">
+<h3><code>ListaDeMedidores</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Medidor"><code>Medidor</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Medidor&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Lluviometro" class="esquema">
+<h3><code>Lluviometro</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>fecha</code></td><td><code>string</code> (date-time)</td><td>no</td><td><p>La pantalla de detalle muestra la fecha (<code>AAAA-MM-DD</code>) y la hora (<code>HH:MM</code>) a partir de esta cadena.</p></td></tr>
+<tr><td><code>muestra</code></td><td><code>string</code></td><td>no</td><td><p>Milímetros registrados, como los escribe la persona.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;id&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;fecha&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;date-time&quot;,
+      &quot;description&quot;: &quot;La pantalla de detalle muestra la fecha (`AAAA-MM-DD`) y la hora (`HH:MM`) a partir de esta cadena.&quot;
+    },
+    &quot;muestra&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Milímetros registrados, como los escribe la persona.&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-LluviometroNuevo" class="esquema">
+<h3><code>LluviometroNuevo</code></h3>
+<p>Registro de lluvia tal como lo arma <code>screens/stations/Detalleestacion.js</code>. Antes de enviarlo o de dejarlo en la cola sin conexión, <code>validarLluvia</code> (<code>slices/servicios/estaciones.js</code>) exige los dos campos obligatorios, la muestra dentro del rango y una fecha que exista y no sea posterior a hoy; lo que no pasa no sale del teléfono. Reglas completas y política de versiones en <code>docs/FORMULARIOS.md</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>fecha</code></td><td><code>string</code></td><td>sí</td><td><p>Fecha y hora de la lectura en la hora local del teléfono. El selector entrega <code>AAAA-MM-DD HH:mm</code>; la app admite también <code>AAAA-MM-DD</code>, el separador <code>T</code> y los segundos. Tiene que ser una fecha que exista y no posterior a hoy (<code>x-no-posterior-a</code>): vale cualquier hora del día de hoy, hasta las 23:59; un día posterior no.</p><p class="reglas">patrón: <code>^\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}(?::\d{2})?)?$</code> · <code>x-no-posterior-a</code>: <code>&quot;hoy&quot;</code></p></td></tr>
+<tr><td><code>muestra</code></td><td><code>string</code> (decimal)</td><td>sí</td><td><p>Milímetros de lluvia, como texto decimal con punto (<code>12.5</code>). Entre <code>x-minimo</code> y <code>x-maximo</code>, ambos incluidos: de 0 a 500 mm.</p><p class="reglas">patrón: <code>^\d+(?:\.\d+)?$</code> · <code>x-minimo</code>: <code>0</code> · <code>x-maximo</code>: <code>500</code> · <code>x-unidad</code>: <code>&quot;mm&quot;</code></p></td></tr>
+<tr><td><code>observacion</code></td><td><code>string</code></td><td>no</td><td><p>Comentario libre de la lectura; puede ir vacío.</p></td></tr>
+<tr><td><code>version_formulario</code></td><td><code>string</code></td><td>no</td><td><p>Versión del formulario que originó el registro: <code>VERSION_FORMULARIO_LLUVIA</code> de <code>slices/constants.js</code>, que el servicio añade al cuerpo. Se sube según la política de <code>docs/FORMULARIOS.md</code>.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Registro de lluvia tal como lo arma `screens/stations/Detalleestacion.js`. Antes de enviarlo o de dejarlo en la cola sin conexión, `validarLluvia` (`slices/servicios/estaciones.js`) exige los dos campos obligatorios, la muestra dentro del rango y una fecha que exista y no sea posterior a hoy; lo que no pasa no sale del teléfono. Reglas completas y política de versiones en `docs/FORMULARIOS.md`.&quot;,
+  &quot;required&quot;: [
+    &quot;fecha&quot;,
+    &quot;muestra&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;fecha&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;pattern&quot;: &quot;^\\d{4}-\\d{2}-\\d{2}(?:[ T]\\d{2}:\\d{2}(?::\\d{2})?)?$&quot;,
+      &quot;description&quot;: &quot;Fecha y hora de la lectura en la hora local del teléfono. El selector entrega `AAAA-MM-DD HH:mm`; la app admite también `AAAA-MM-DD`, el separador `T` y los segundos. Tiene que ser una fecha que exista y no posterior a hoy (`x-no-posterior-a`): vale cualquier hora del día de hoy, hasta las 23:59; un día posterior no.&quot;,
+      &quot;x-no-posterior-a&quot;: &quot;hoy&quot;
+    },
+    &quot;muestra&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;decimal&quot;,
+      &quot;pattern&quot;: &quot;^\\d+(?:\\.\\d+)?$&quot;,
+      &quot;description&quot;: &quot;Milímetros de lluvia, como texto decimal con punto (`12.5`). Entre `x-minimo` y `x-maximo`, ambos incluidos: de 0 a 500 mm.&quot;,
+      &quot;x-minimo&quot;: 0,
+      &quot;x-maximo&quot;: 500,
+      &quot;x-unidad&quot;: &quot;mm&quot;
+    },
+    &quot;observacion&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Comentario libre de la lectura; puede ir vacío.&quot;
+    },
+    &quot;version_formulario&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Versión del formulario que originó el registro: `VERSION_FORMULARIO_LLUVIA` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`.&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeLluviometros" class="esquema">
+<h3><code>ListaDeLluviometros</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Lluviometro"><code>Lluviometro</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Lluviometro&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Favorito" class="esquema">
+<h3><code>Favorito</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>actividad</code></td><td><code>integer</code></td><td>sí</td><td><p>Identificador de la actividad.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;actividad&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;actividad&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;description&quot;: &quot;Identificador de la actividad.&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-FavoritoNuevo" class="esquema">
+<h3><code>FavoritoNuevo</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>actividad</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;actividad&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;actividad&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeFavoritos" class="esquema">
+<h3><code>ListaDeFavoritos</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Favorito"><code>Favorito</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Favorito&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Actividad" class="esquema">
+<h3><code>Actividad</code></h3>
+<p>Campos que leen las pantallas de actividades y favoritos; el API devuelve más.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>tipo</code></td><td><code>string</code></td><td>sí</td><td><p><code>Evento</code> para los eventos; el resto se muestra como cursos.</p></td></tr>
+<tr><td><code>title</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>imagen</code></td><td><code>string</code> (uri)</td><td>no</td><td></td></tr>
+<tr><td><code>url</code></td><td><code>string</code> (uri) o <code>null</code></td><td>no</td><td><p>Página de la actividad en el portal; la pantalla la abre si viene.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Campos que leen las pantallas de actividades y favoritos; el API devuelve más.&quot;,
+  &quot;required&quot;: [
+    &quot;id&quot;,
+    &quot;tipo&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;tipo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;`Evento` para los eventos; el resto se muestra como cursos.&quot;
+    },
+    &quot;title&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;imagen&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;uri&quot;
+    },
+    &quot;url&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;uri&quot;,
+      &quot;nullable&quot;: true,
+      &quot;description&quot;: &quot;Página de la actividad en el portal; la pantalla la abre si viene.&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeActividades" class="esquema">
+<h3><code>ListaDeActividades</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Actividad"><code>Actividad</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Actividad&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Noticia" class="esquema">
+<h3><code>Noticia</code></h3>
+<p>La pantalla de inicio recorre <code>values</code> y lee <code>id</code>, <code>titulo</code> e <code>imagen</code>; el resto de claves no está fijado por contrato.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>titulo</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>imagen</code></td><td><code>string</code> (uri) o <code>null</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;La pantalla de inicio recorre `values` y lee `id`, `titulo` e `imagen`; el resto de claves no está fijado por contrato.&quot;,
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;titulo&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;imagen&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;uri&quot;,
+      &quot;nullable&quot;: true
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeNoticias" class="esquema">
+<h3><code>ListaDeNoticias</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Noticia"><code>Noticia</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Noticia&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Multimedia" class="esquema">
+<h3><code>Multimedia</code></h3>
+<p>Pieza de <code>GET /multimedias</code> en el API 1.3.8. No trae <code>tipo</code> ni <code>enlace</code>: el tipo va en cada archivo. La app abre el archivo principal (o el primero) y toma como miniatura la imagen principal (o la primera).</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>titulo</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>componente</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>resumen</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>activo</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+<tr><td><code>archivos</code></td><td>lista de <a href="#esquema-MultimediaArchivo"><code>MultimediaArchivo</code></a></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Pieza de `GET /multimedias` en el API 1.3.8. No trae `tipo` ni `enlace`: el tipo va en cada archivo. La app abre el archivo principal (o el primero) y toma como miniatura la imagen principal (o la primera).&quot;,
+  &quot;required&quot;: [
+    &quot;id&quot;,
+    &quot;titulo&quot;,
+    &quot;archivos&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;titulo&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;componente&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;resumen&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;activo&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    },
+    &quot;archivos&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;$ref&quot;: &quot;#/components/schemas/MultimediaArchivo&quot;
+      }
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-MultimediaArchivo" class="esquema">
+<h3><code>MultimediaArchivo</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>tipo</code></td><td><code>string</code></td><td>sí</td><td><p>La app lo compara sin distinguir mayúsculas.</p><p class="reglas">valores: <code>&quot;Imagen&quot;</code>, <code>&quot;Video&quot;</code></p></td></tr>
+<tr><td><code>archivo</code></td><td><code>string</code> (uri)</td><td>sí</td><td></td></tr>
+<tr><td><code>es_principal</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;tipo&quot;,
+    &quot;archivo&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;tipo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;Imagen&quot;,
+        &quot;Video&quot;
+      ],
+      &quot;description&quot;: &quot;La app lo compara sin distinguir mayúsculas.&quot;
+    },
+    &quot;archivo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;uri&quot;
+    },
+    &quot;es_principal&quot;: {
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeMultimedia" class="esquema">
+<h3><code>ListaDeMultimedia</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Multimedia"><code>Multimedia</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Multimedia&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Documento" class="esquema">
+<h3><code>Documento</code></h3>
+<p>Documento de <code>GET /documentos</code> en el API 1.3.8. No trae <code>id</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>titulo</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>descripcion</code></td><td><code>string</code></td><td>no</td><td><p>HTML; la app no lo muestra.</p></td></tr>
+<tr><td><code>tipo</code></td><td><code>string</code></td><td>no</td><td><p><code>DOCUMENTO</code>.</p></td></tr>
+<tr><td><code>archivo</code></td><td><code>string</code> (uri)</td><td>sí</td><td><p>El documento; es lo que abre «DESCÁRGALO».</p></td></tr>
+<tr><td><code>portada</code></td><td><code>string</code> (uri)</td><td>no</td><td><p>Carátula; la app la pinta como miniatura.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Documento de `GET /documentos` en el API 1.3.8. No trae `id`.&quot;,
+  &quot;required&quot;: [
+    &quot;titulo&quot;,
+    &quot;archivo&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;titulo&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;descripcion&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;HTML; la app no lo muestra.&quot;
+    },
+    &quot;tipo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;`DOCUMENTO`.&quot;
+    },
+    &quot;archivo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;uri&quot;,
+      &quot;description&quot;: &quot;El documento; es lo que abre «DESCÁRGALO».&quot;
+    },
+    &quot;portada&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;uri&quot;,
+      &quot;description&quot;: &quot;Carátula; la app la pinta como miniatura.&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeDocumentos" class="esquema">
+<h3><code>ListaDeDocumentos</code></h3>
+<p>Envoltorio de <code>GET /documentos</code>. La especificación solo declara <code>values</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Documento"><code>Documento</code></a></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Envoltorio de `GET /documentos`. La especificación solo declara `values`.&quot;,
+  &quot;required&quot;: [
+    &quot;values&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;values&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;$ref&quot;: &quot;#/components/schemas/Documento&quot;
+      }
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-GrupoPiraguero" class="esquema">
+<h3><code>GrupoPiraguero</code></h3>
+<p>Campos que leen <code>screens/user/Grupo.js</code> y <code>screens/user/UserEdit.js</code>; el API devuelve más.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>nombre</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td><p>Cuando viene vacío, la edición del perfil muestra el <code>id</code>.</p></td></tr>
+<tr><td><code>codigo</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>tipo_nombre</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>descripcion</code></td><td><code>string</code> o <code>null</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;id&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;nombre&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true,
+      &quot;description&quot;: &quot;Cuando viene vacío, la edición del perfil muestra el `id`.&quot;
+    },
+    &quot;codigo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;tipo_nombre&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    },
+    &quot;descripcion&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;nullable&quot;: true
+    }
+  },
+  &quot;description&quot;: &quot;Campos que leen `screens/user/Grupo.js` y `screens/user/UserEdit.js`; el API devuelve más.&quot;
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeGrupos" class="esquema">
+<h3><code>ListaDeGrupos</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-GrupoPiraguero"><code>GrupoPiraguero</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/GrupoPiraguero&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Pregunta" class="esquema">
+<h3><code>Pregunta</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>pregunta</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>respuesta</code></td><td><code>string</code></td><td>no</td><td><p>El portal la entrega con un máximo de 255 caracteres.</p></td></tr>
+<tr><td><code>topics</code></td><td><code>string</code></td><td>sí</td><td><p class="reglas">valores: <code>&quot;CONOCENOS&quot;</code>, <code>&quot;VINCULACION&quot;</code></p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;pregunta&quot;,
+    &quot;topics&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;pregunta&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;respuesta&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;El portal la entrega con un máximo de 255 caracteres.&quot;
+    },
+    &quot;topics&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;CONOCENOS&quot;,
+        &quot;VINCULACION&quot;
+      ]
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDePreguntas" class="esquema">
+<h3><code>ListaDePreguntas</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Pregunta"><code>Pregunta</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Pregunta&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Observatorio" class="esquema">
+<h3><code>Observatorio</code></h3>
+<p>Forma no documentada por el Sistema: la app comprueba <code>id</code> al crear y muestra la lista tal como llega. El ejemplo repite los campos que la app envía al crear; el Sistema debe confirmar cuáles devuelve.</p>
+<p>Tipo: <code>object</code>.</p>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Forma no documentada por el Sistema: la app comprueba `id` al crear y muestra la lista tal como llega. El ejemplo repite los campos que la app envía al crear; el Sistema debe confirmar cuáles devuelve.&quot;
+}</pre>
+</details>
+</section>
+<section id="esquema-ObservatorioNuevo" class="esquema">
+<h3><code>ObservatorioNuevo</code></h3>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>fecha</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>categoria</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>tipo</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>actividad</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>descripcion</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>altitud</code></td><td><code>string</code></td><td>no</td><td></td></tr>
+<tr><td><code>longitud</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>latitud</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
+<tr><td><code>foto</code></td><td><code>string</code> (binary)</td><td>sí</td><td><p>Fotografía JPEG tomada con la cámara.</p></td></tr>
+<tr><td><code>municipio</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;fecha&quot;,
+    &quot;categoria&quot;,
+    &quot;tipo&quot;,
+    &quot;actividad&quot;,
+    &quot;descripcion&quot;,
+    &quot;latitud&quot;,
+    &quot;longitud&quot;,
+    &quot;foto&quot;,
+    &quot;municipio&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;fecha&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;categoria&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;tipo&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;actividad&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;descripcion&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;altitud&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;longitud&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;latitud&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;foto&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;binary&quot;,
+      &quot;description&quot;: &quot;Fotografía JPEG tomada con la cámara.&quot;
+    },
+    &quot;municipio&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-ListaDeObservatorios" class="esquema">
+<h3><code>ListaDeObservatorios</code></h3>
+<p>Combina: <a href="#esquema-ListaPaginada"><code>ListaPaginada</code></a>, <code>object</code>.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>values</code></td><td>lista de <a href="#esquema-Observatorio"><code>Observatorio</code></a></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;allOf&quot;: [
+    {
+      &quot;$ref&quot;: &quot;#/components/schemas/ListaPaginada&quot;
+    },
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;values&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;$ref&quot;: &quot;#/components/schemas/Observatorio&quot;
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+</details>
+</section>
+<section id="esquema-Dispositivo" class="esquema">
+<h3><code>Dispositivo</code></h3>
+<p>Cuerpo que envía <code>registrarDispositivo</code> (<code>slices/notificaciones.js</code>). Propuesta de la app para la 1.10.2; el Sistema debe confirmar la forma.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>token</code></td><td><code>string</code></td><td>sí</td><td><p>Token de notificaciones de Expo del dispositivo.</p></td></tr>
+<tr><td><code>plataforma</code></td><td><code>string</code></td><td>sí</td><td><p class="reglas">valores: <code>&quot;android&quot;</code>, <code>&quot;ios&quot;</code></p></td></tr>
+<tr><td><code>version_app</code></td><td><code>string</code></td><td>no</td><td><p>Versión de la app instalada.</p></td></tr>
+<tr><td><code>modelo</code></td><td><code>string</code></td><td>no</td><td><p>Modelo del dispositivo.</p></td></tr>
+<tr><td><code>so</code></td><td><code>string</code></td><td>no</td><td><p>Sistema operativo y versión.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Cuerpo que envía `registrarDispositivo` (`slices/notificaciones.js`). Propuesta de la app para la 1.10.2; el Sistema debe confirmar la forma.&quot;,
+  &quot;required&quot;: [
+    &quot;token&quot;,
+    &quot;plataforma&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;token&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Token de notificaciones de Expo del dispositivo.&quot;
+    },
+    &quot;plataforma&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;android&quot;,
+        &quot;ios&quot;
+      ]
+    },
+    &quot;version_app&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Versión de la app instalada.&quot;
+    },
+    &quot;modelo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Modelo del dispositivo.&quot;
+    },
+    &quot;so&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Sistema operativo y versión.&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-DispositivoRegistrado" class="esquema">
+<h3><code>DispositivoRegistrado</code></h3>
+<p>La app lee <code>id</code> si viene; el resto de la forma no está documentada.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;La app lee `id` si viene; el resto de la forma no está documentada.&quot;,
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  }
+}</pre>
+</details>
+</section>
+<section id="esquema-Umbrales" class="esquema">
+<h3><code>Umbrales</code></h3>
+<p>Municipios con umbral de alerta activo. Es lo que envía <code>guardarUmbrales</code> (<code>slices/notificaciones.js</code>); al leer, la app acepta esta forma, la lista suelta o la lista bajo <code>values</code>. Propuesta de la app para la 1.10.2, pendiente de acordar con el Sistema.</p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>municipios</code></td><td>lista de <code>integer</code></td><td>sí</td><td><p>Identificadores de municipio.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;description&quot;: &quot;Municipios con umbral de alerta activo. Es lo que envía `guardarUmbrales` (`slices/notificaciones.js`); al leer, la app acepta esta forma, la lista suelta o la lista bajo `values`. Propuesta de la app para la 1.10.2, pendiente de acordar con el Sistema.&quot;,
+  &quot;required&quot;: [
+    &quot;municipios&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;municipios&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;description&quot;: &quot;Identificadores de municipio.&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;integer&quot;
+      }
+    }
+  }
+}</pre>
+</details>
+</section>
+</div>
+<div id="respuestas">
+<h2>Respuestas compartidas</h2>
+<section id="respuesta-NoAutorizado" class="compartido">
+<h3><code>NoAutorizado</code></h3>
+<p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Error"><code>Error</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;detail&quot;: &quot;Las credenciales de autenticación no se proveyeron.&quot;
+}</pre>
+</section>
+<section id="respuesta-ErrorDeCliente" class="compartido">
+<h3><code>ErrorDeCliente</code></h3>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-Error"><code>Error</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;detail&quot;: &quot;No encontrado.&quot;
+}</pre>
+</section>
+<section id="respuesta-ErrorDeValidacion" class="compartido">
+<h3><code>ErrorDeValidacion</code></h3>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;telefono&quot;: [
+    &quot;Este campo es obligatorio.&quot;
+  ],
+  &quot;user&quot;: {
+    &quot;username&quot;: [
+      &quot;Ya existe una cuenta con este correo.&quot;
+    ]
+  }
+}</pre>
+</section>
+</div>
+<div id="parametros">
+<h2>Parámetros compartidos</h2>
+<section id="parametro-usuarioId" class="compartido">
+<h3><code>usuarioId</code></h3>
+<p class="reglas"><code>id</code> en <code>path</code> · obligatorio · <code>integer</code></p>
+<p>Identificador del usuario con sesión (<code>id</code> de la respuesta de <code>/login</code>).</p>
+</section>
+<section id="parametro-size" class="compartido">
+<h3><code>size</code></h3>
+<p class="reglas"><code>size</code> en <code>query</code> · opcional · <code>integer</code></p>
+<p>Tamaño de página de las listas paginadas.</p>
+</section>
+</div>
+</main>
+</body>
+</html>
