@@ -91,8 +91,8 @@ summary { cursor: pointer; color: var(--enlace); }
 <!-- Generado por bin/generar-manual-api.mjs a partir del contrato OpenAPI. No se edita a mano: se cambia el contrato y se regenera. -->
 <header id="inicio">
 <h1>API institucional Piragua: rutas que consume la app móvil</h1>
-<p class="meta">Versión del contrato <code>1.10.2</code> · OpenAPI <code>3.0.3</code> · 31 operaciones · 45 esquemas</p>
-<p>Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. Cada operación lleva dos extensiones: <code>x-estado</code>, que vale <code>en uso</code> cuando el código del árbol la llama hoy y <code>propuesto</code> cuando es un contrato que la versión 1.10.2 necesita y el Sistema todavía tiene que confirmar; y <code>x-origen</code>, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es <code>type: object</code> con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba <code>__tests__/openapi-app.test.js</code> cruza las rutas de <code>slices/</code> contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (<code>__tests__/openapi-ejemplos.test.js</code> comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en <code>docs/FORMULARIOS.md</code>, y <code>__tests__/formularios-doc.test.js</code> las ata a <code>validarLluvia</code> y a <code>slices/constants.js</code>. El manual de referencia en HTML, <code>docs/api/index.html</code>, se genera desde este contrato con <code>node bin/generar-manual-api.mjs</code>; <code>__tests__/manual-api.test.js</code> falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8, la de la especificación oficial del Programa (también en <code>x-version-api</code>); los códigos de respuesta, la ruta <code>/documentos</code> y la forma de <code>/multimedias</code> salen de ella.</p>
+<p class="meta">Versión del contrato <code>1.10.5.1</code> · OpenAPI <code>3.0.3</code> · 31 operaciones · 45 esquemas</p>
+<p>Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. La versión del contrato es la de la app que describe, la 1.10.5.1; en iOS ese mismo código lleva el número 1.10.5 (build 9), porque Apple solo admite tres números en la versión. Cada operación lleva dos extensiones: <code>x-estado</code>, que vale <code>en uso</code> cuando el código del árbol la llama hoy y <code>propuesto</code> cuando es un contrato que la app necesita y el Sistema todavía tiene que confirmar; y <code>x-origen</code>, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es <code>type: object</code> con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba <code>__tests__/openapi-app.test.js</code> cruza las rutas de <code>slices/</code> contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (<code>__tests__/openapi-ejemplos.test.js</code> comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en <code>docs/FORMULARIOS.md</code>, y <code>__tests__/formularios-doc.test.js</code> las ata a <code>validarLluvia</code> y a <code>slices/constants.js</code>. El manual de referencia en HTML, <code>docs/api/index.html</code>, se genera desde este contrato con <code>node bin/generar-manual-api.mjs</code>; <code>__tests__/manual-api.test.js</code> falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8 (también en <code>x-version-api</code>), la de la especificación oficial del Programa, publicada en https://piragua.corantioquia.gov.co/developers/api.yaml; los códigos de respuesta, la ruta <code>/documentos</code> y la forma de <code>/multimedias</code> salen de esa especificación. El cotejo operación por operación, con las diferencias y a quién le toca cada una, está en <code>docs/CONTRATO-API.md</code>.</p>
 <p class="nota">Página generada por <code>bin/generar-manual-api.mjs</code> a partir de <code>docs/openapi-app.json</code>. No se edita a mano: se cambia el contrato y se regenera; <code>__tests__/manual-api.test.js</code> falla si el manual guardado no corresponde al contrato.</p>
 </header>
 <nav id="indice" aria-label="Índice">
@@ -121,7 +121,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <li class="grupo"><a href="#etiqueta-estaciones">estaciones</a>
 <ul>
 <li><a href="#op-estacionMasCercana"><span class="metodo metodo-get">GET</span> <code>/estaciones</code></a></li>
-<li><a href="#op-meteorologiaDiaria"><span class="metodo metodo-get">GET</span> <code>/estaciones/{codigo}/meteorologia/diario</code></a></li>
+<li><a href="#op-meteorologiaDiaria"><span class="metodo metodo-get">GET</span> <code>/estaciones/{codigo}/meteorologia/diario/</code></a></li>
 </ul>
 </li>
 <li class="grupo"><a href="#etiqueta-medidores">medidores</a>
@@ -179,7 +179,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <h2>Autenticación</h2>
 <section id="seguridad-bearer" class="compartido">
 <h3><code>bearer</code> · oauth2</h3>
-<p>Token de acceso OAuth2 obtenido con el flujo de contraseña sobre <code>POST /login</code>, que recibe <code>client_id</code>, <code>client_secret</code>, <code>username</code> y <code>password</code> en un cuerpo JSON (no en formulario) y devuelve el token dentro de <code>oauth2.access_token</code>. <code>slices/apiClient.js</code> añade <code>Authorization: Bearer &lt;token&gt;</code> a toda petición relativa mientras haya sesión y cierra la sesión local ante el primer 401 de cada ráfaga. Nunca se envía a URL absolutas de otros hosts.</p>
+<p>Token de acceso OAuth2 obtenido con el flujo de contraseña sobre <code>POST /login</code>, que recibe <code>client_id</code>, <code>client_secret</code>, <code>grant_type</code> (<code>password</code>), <code>username</code> (nombre de usuario o correo) y <code>password</code> en un cuerpo JSON (no en formulario) y devuelve el token dentro de <code>oauth2.access_token</code>. <code>slices/apiClient.js</code> añade <code>Authorization: Bearer &lt;token&gt;</code> a toda petición relativa mientras haya sesión y cierra la sesión local ante el primer 401 de cada ráfaga. Nunca se envía a URL absolutas de otros hosts.</p>
 <p class="reglas">flujo <code>password</code> · <code>tokenUrl</code>: <code>https://geopiragua.corantioquia.gov.co/api/v1/login</code> · sin alcances</p>
 </section>
 </div>
@@ -187,7 +187,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <h2>Operaciones</h2>
 <div id="etiqueta-sesion" class="grupo">
 <h3>sesion</h3>
-<p>Ingreso, registro y recuperación de contraseña. Se llaman por XMLHttpRequest antes de que exista sesión; no llevan Bearer.</p>
+<p>Ingreso, registro y recuperación de contraseña, que se llaman antes de que exista sesión, y renovación y revocación del token. Todas van con URL absoluta, así que el cliente HTTP no les adjunta el Bearer.</p>
 <section id="op-iniciarSesion" class="operacion">
 <h4><span class="metodo metodo-post">POST</span> <code class="ruta">/login</code></h4>
 <p class="resumen">Inicio de sesión (OAuth2, flujo de contraseña)</p>
@@ -197,16 +197,25 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/auth/Signin.js</code>, <code>screens/auth/Signup.js</code></dd>
 <dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
 </dl>
-<p>La app envía en el cuerpo JSON las credenciales del cliente OAuth2 y las de la persona. La respuesta es el usuario completo con un bloque <code>oauth2</code> que trae el <code>access_token</code>; la app guarda en el teléfono solo los campos de <code>ESQUEMA_DE_SESION</code> (<code>context/sessionStorage.js</code>), y el <code>refresh_token</code> lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (<code>slices/tokenDeRenovacion.js</code>) para renovar el token de acceso con <code>/oauth2/token/</code>. <code>screens/auth/Signup.js</code> llama a la misma ruta con barra final (<code>/login/</code>) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene.</p>
+<p>La app envía en el cuerpo JSON las credenciales del cliente OAuth2, la concesión <code>grant_type</code> con el valor <code>password</code> y las de la persona: en <code>username</code>, su nombre de usuario o su correo, y en <code>password</code>, su contraseña. Desde la 1.10.5.1 la pantalla de ingreso acepta el usuario o el correo (antes exigía un correo) y el cuerpo declara <code>grant_type</code>, como hace el portal web ante el mismo servicio (<code>docs/CONTRATO-API.md</code>, A-06). La respuesta es el usuario completo con un bloque <code>oauth2</code> que trae el <code>access_token</code>; la app guarda en el teléfono solo los campos de <code>ESQUEMA_DE_SESION</code> (<code>context/sessionStorage.js</code>), y el <code>refresh_token</code> lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (<code>slices/tokenDeRenovacion.js</code>) para renovar el token de acceso con <code>/oauth2/token/</code>. <code>screens/auth/Signup.js</code> inicia sesión por la misma ruta y con el mismo servicio (<code>iniciarSesion</code>, <code>slices/servicios/usuarios.js</code>) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene.</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/json</code></p>
 <p>Esquema: <a href="#esquema-Credenciales"><code>Credenciales</code></a></p>
-<p class="rotulo">Ejemplo</p>
+<p class="rotulo">Ejemplo <code>conCorreo</code>: Ingreso con el correo de la cuenta</p>
 <pre class="ejemplo">{
   &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
   &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;,
+  &quot;grant_type&quot;: &quot;password&quot;,
   &quot;username&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;,
+  &quot;password&quot;: &quot;contraseña-de-ejemplo&quot;
+}</pre>
+<p class="rotulo">Ejemplo <code>conUsuario</code>: Ingreso con el nombre de usuario</p>
+<pre class="ejemplo">{
+  &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
+  &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;,
+  &quot;grant_type&quot;: &quot;password&quot;,
+  &quot;username&quot;: &quot;persona.ejemplo&quot;,
   &quot;password&quot;: &quot;contraseña-de-ejemplo&quot;
 }</pre>
 <h5>Respuestas</h5>
@@ -247,7 +256,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
 </div>
 <div class="respuesta error" data-codigo="4XX">
-<p class="titulo-respuesta"><span class="codigo">4XX</span> Credenciales rechazadas. La app muestra <code>error_description</code>.</p>
+<p class="titulo-respuesta"><span class="codigo">4XX</span> Credenciales rechazadas u otro rechazo del servicio, con el cuerpo <code>{ error, error_description }</code>. La app no muestra <code>error_description</code>: elige su aviso por el código de <code>error</code> (<code>slices/avisoDelFallo.js</code>). Con <code>invalid_grant</code> o <code>Credencial invalida</code> dice «El usuario o la contraseña no son correctos»; con otro código, ante un 429 o si el cuerpo no es JSON, muestra sus propios avisos.</p>
 <p class="medio"><code>application/json</code></p>
 <p>Esquema: <a href="#esquema-ErrorOAuth2"><code>ErrorOAuth2</code></a></p>
 <p class="rotulo">Ejemplo</p>
@@ -262,11 +271,11 @@ summary { cursor: pointer; color: var(--enlace); }
 <p class="resumen">Revocar los tokens de la sesión al cerrarla</p>
 <dl class="datos">
 <dt>operationId</dt><dd><code>revocarToken</code></dd>
-<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
 <dt><code>x-origen</code></dt><dd><code>context/AuthProvider.js</code>, <code>slices/servicios/usuarios.js</code></dd>
 <dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
 </dl>
-<p>Propuesta de la app para la 1.10.3: al cerrar sesión, después de dar de baja el dispositivo (<code>DELETE /dispositivos/{token}</code>) y antes de borrar la sesión del teléfono, la app pide revocar el <code>access_token</code> y, si lo tiene guardado, el <code>refresh_token</code> (dos llamadas a la vez, cada una con su <code>token_type_hint</code>) para que dejen de valer aunque quede una copia fuera del teléfono. Es la ruta de revocación del servicio OAuth2 del API; el Sistema debe confirmar dónde está montada y qué responde. La app la llama con URL absoluta y sin Bearer: se autentica con el mismo par de cliente que el inicio de sesión, en un formulario. Es de mejor esfuerzo: sin red, con un rechazo o pasado el límite de espera la sesión local se borra igual y no se muestra nada (<code>revocarToken</code>, <code>slices/servicios/usuarios.js</code>).</p>
+<p>Documentada por el Sistema de Información en la especificación oficial 1.3.8, publicada en https://piragua.corantioquia.gov.co/developers/ (cotejo del 2026-10-08 en <code>docs/CONTRATO-API.md</code>). Diferencia abierta: el esquema <code>OAuthRevoke</code> marca <code>grant_type</code> como obligatorio y no trae <code>token_type_hint</code>, mientras que la app, como el ejemplo <code>curl</code> de la documentación del Programa, no envía <code>grant_type</code>; el Sistema debe aclararlo. La app la usa desde la 1.10.3: al cerrar sesión, después de dar de baja el dispositivo (<code>DELETE /dispositivos/{token}</code>) y antes de borrar la sesión del teléfono, la app pide revocar el <code>access_token</code> y, si lo tiene guardado, el <code>refresh_token</code> (dos llamadas a la vez, cada una con su <code>token_type_hint</code>) para que dejen de valer aunque quede una copia fuera del teléfono. La app la llama con URL absoluta y sin Bearer: se autentica con el mismo par de cliente que el inicio de sesión, en un formulario. Es de mejor esfuerzo: sin red, con un rechazo o pasado el límite de espera la sesión local se borra igual y no se muestra nada (<code>revocarToken</code>, <code>slices/servicios/usuarios.js</code>).</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/x-www-form-urlencoded</code></p>
@@ -333,7 +342,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-renovarToken" class="operacion">
@@ -341,11 +350,11 @@ summary { cursor: pointer; color: var(--enlace); }
 <p class="resumen">Renovar el token de acceso con el token de renovación</p>
 <dl class="datos">
 <dt>operationId</dt><dd><code>renovarToken</code></dd>
-<dt><code>x-estado</code></dt><dd>propuesto</dd>
+<dt><code>x-estado</code></dt><dd>en uso</dd>
 <dt><code>x-origen</code></dt><dd><code>context/AuthProvider.js</code>, <code>slices/servicios/usuarios.js</code></dd>
 <dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
 </dl>
-<p>Propuesta de la app para la 1.10.3: cuando una ruta del API contesta 401 a una petición con el Bearer de la sesión, la app pide aquí un token de acceso nuevo con el <code>refresh_token</code> del inicio de sesión (flujo <code>refresh_token</code> de OAuth2) y repite la petición una vez con él. Todas las peticiones que reciban 401 mientras tanto esperan a esa misma renovación. La ruta no figura en la documentación del API: se da por hecha porque es la de emisión de tokens del mismo servicio OAuth2 que atiende <code>/oauth2/revoke_token/</code>, y el Sistema debe confirmar dónde está montada y qué responde. La app la llama con URL absoluta y sin Bearer, en un formulario con el mismo par de cliente que el inicio de sesión. Si la respuesta trae un <code>refresh_token</code> nuevo, la app lo guarda en lugar del anterior; si no, conserva el anterior. Cualquier respuesta de error (400 <code>invalid_grant</code>, 401 <code>invalid_client</code>, un 404 si la ruta no existe) cierra la sesión como antes de existir la renovación; si no hay respuesta (sin red, límite de espera agotado), la sesión sigue abierta y la petición original falla con su 401 (<code>renovarToken</code>, <code>slices/servicios/usuarios.js</code>; <code>slices/apiClient.js</code>).</p>
+<p>Documentada por el Sistema de Información en la especificación oficial 1.3.8 (<code>/oauth2/token/</code>, flujos <code>password</code>, <code>client_credentials</code> y <code>refresh_token</code>; <code>expires_in</code> 36000), publicada en https://piragua.corantioquia.gov.co/developers/ (cotejo del 2026-10-08 en <code>docs/CONTRATO-API.md</code>). La app la usa desde la 1.10.3: cuando una ruta del API contesta 401 a una petición con el Bearer de la sesión, la app pide aquí un token de acceso nuevo con el <code>refresh_token</code> del inicio de sesión (flujo <code>refresh_token</code> de OAuth2) y repite la petición una vez con él. Todas las peticiones que reciban 401 mientras tanto esperan a esa misma renovación. La app la llama con URL absoluta y sin Bearer, en un formulario con el mismo par de cliente que el inicio de sesión. Si la respuesta trae un <code>refresh_token</code> nuevo, la app lo guarda en lugar del anterior; si no, conserva el anterior. Cualquier respuesta de error (400 <code>invalid_grant</code>, 401 <code>invalid_client</code>, un 404 si la ruta no existe) cierra la sesión como antes de existir la renovación; si no hay respuesta (sin red, límite de espera agotado), la sesión sigue abierta y la petición original falla con su 401 (<code>renovarToken</code>, <code>slices/servicios/usuarios.js</code>; <code>slices/apiClient.js</code>).</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/x-www-form-urlencoded</code></p>
@@ -436,7 +445,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/auth/Signup.js</code></dd>
 <dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
 </dl>
-<p>La app llama a la ruta con barra final (<code>/usuarios/</code>). La respuesta se da por buena si trae <code>id</code>; a continuación la app inicia sesión con <code>/login/</code>. Un 400 llega con mensajes por campo (por ejemplo <code>user.username</code> con la lista de errores); si el correo ya existe, la app lo explica, porque el Sistema conserva el usuario de autenticación de las cuentas eliminadas.</p>
+<p>La app llama a la ruta con barra final (<code>/usuarios/</code>). La respuesta se da por buena si trae <code>id</code>; a continuación la app inicia sesión con <code>POST /login</code>. Un 400 llega con mensajes por campo (por ejemplo <code>user.username</code> con la lista de errores); si el correo ya existe, la app lo explica, porque el Sistema conserva el usuario de autenticación de las cuentas eliminadas.</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/json</code></p>
@@ -490,7 +499,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
-<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico. Un 429 (límite de peticiones del API) no se reparte por campos: desde la 1.10.5, donde la app lo muestra, lo hace con su propio aviso en español y no con el texto del servidor.</p>
 </div>
 </section>
 <section id="op-recuperarContrasena" class="operacion">
@@ -502,7 +511,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/auth/Forgot.js</code></dd>
 <dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
 </dl>
-<p>Recibe el correo como <code>username</code> junto con las credenciales del cliente. La app da la solicitud por aceptada cuando la respuesta trae <code>ok</code>; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse.</p>
+<p>Recibe en <code>username</code> el nombre de usuario o el correo de la cuenta, normalizado como en <code>POST /login</code>, junto con las credenciales del cliente: lo mismo que manda el portal web. Desde la 1.10.5.1 la pantalla pide el usuario o el correo; antes exigía un correo. La app da la solicitud por aceptada cuando la respuesta trae <code>ok</code>; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse.</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/json</code></p>
@@ -513,7 +522,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <tbody>
 <tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
 <tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
-<tr><td><code>username</code></td><td><code>string</code> (email)</td><td>sí</td><td><p>Correo de la cuenta, en minúsculas.</p></td></tr>
+<tr><td><code>username</code></td><td><code>string</code></td><td>sí</td><td><p>Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva <code>@</code>, en minúsculas, como en <code>POST /login</code>.</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -535,17 +544,22 @@ summary { cursor: pointer; color: var(--enlace); }
     },
     &quot;username&quot;: {
       &quot;type&quot;: &quot;string&quot;,
-      &quot;format&quot;: &quot;email&quot;,
-      &quot;description&quot;: &quot;Correo de la cuenta, en minúsculas.&quot;
+      &quot;description&quot;: &quot;Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva `@`, en minúsculas, como en `POST /login`.&quot;
     }
   }
 }</pre>
 </details>
-<p class="rotulo">Ejemplo</p>
+<p class="rotulo">Ejemplo <code>conCorreo</code>: Con el correo de la cuenta</p>
 <pre class="ejemplo">{
   &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
   &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;,
   &quot;username&quot;: &quot;persona.ejemplo@ejemplo.gov.co&quot;
+}</pre>
+<p class="rotulo">Ejemplo <code>conUsuario</code>: Con el nombre de usuario</p>
+<pre class="ejemplo">{
+  &quot;client_id&quot;: &quot;cliente-oauth2-de-la-app&quot;,
+  &quot;client_secret&quot;: &quot;secreto-del-cliente-oauth2&quot;,
+  &quot;username&quot;: &quot;persona.ejemplo&quot;
 }</pre>
 <h5>Respuestas</h5>
 <div class="respuesta" data-codigo="200">
@@ -581,8 +595,33 @@ summary { cursor: pointer; color: var(--enlace); }
 <p>Sin sesión válida. En rutas relativas del API institucional, <code>slices/apiClient.js</code> cierra la sesión local y la app vuelve a la pantalla de ingreso.</p>
 </div>
 <div class="respuesta error" data-codigo="4XX">
-<p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p class="titulo-respuesta"><span class="codigo">4XX</span> Solicitud rechazada. La app no muestra el texto del servicio. Si no hay cuenta con ese usuario o correo, el servicio responde 400 con el mensaje en <code>username</code>, y la app pide escribir el nombre de usuario tal como se creó, o el correo si con él se hizo el registro; ante un 429 muestra el aviso de demasiadas solicitudes, y ante cualquier otro rechazo, su aviso de que no fue posible procesar la solicitud.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema en línea: <code>object</code></p>
+<div class="tabla">
+<table>
+<thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
+<tbody>
+<tr><td><code>username</code></td><td><code>string</code></td><td>no</td><td><p>Mensaje del servicio cuando no hay cuenta con ese usuario o correo. La app solo comprueba que venga.</p></td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>JSON del esquema</summary>
+<pre class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;username&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Mensaje del servicio cuando no hay cuenta con ese usuario o correo. La app solo comprueba que venga.&quot;
+    }
+  }
+}</pre>
+</details>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;username&quot;: &quot;Usuario no encontrado.&quot;
+}</pre>
 </div>
 </section>
 </div>
@@ -669,7 +708,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
-<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico. Un 429 (límite de peticiones del API) no se reparte por campos: desde la 1.10.5, donde la app lo muestra, lo hace con su propio aviso en español y no con el texto del servidor.</p>
 </div>
 </section>
 <section id="op-eliminarCuenta" class="operacion">
@@ -705,7 +744,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-listarGruposPiragueros" class="operacion">
@@ -760,7 +799,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 </div>
@@ -807,11 +846,11 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-meteorologiaDiaria" class="operacion">
-<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/estaciones/{codigo}/meteorologia/diario</code></h4>
+<h4><span class="metodo metodo-get">GET</span> <code class="ruta">/estaciones/{codigo}/meteorologia/diario/</code></h4>
 <p class="resumen">Resumen meteorológico diario de una estación</p>
 <dl class="datos">
 <dt>operationId</dt><dd><code>meteorologiaDiaria</code></dd>
@@ -819,7 +858,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/home/Home.js</code></dd>
 <dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
-<p>La app pide <code>size=1</code> y usa el primer elemento de <code>values</code>; cada magnitud se muestra solo si su bandera <code>calidad_*</code> vale 1.</p>
+<p>La ruta lleva la barra final de la especificación (<code>/estaciones/{codigo}/meteorologia/{frecuencia}/</code>): sin ella el servidor responde con una redirección 301, que añade una petición más a Inicio. La app la llama así desde la 1.10.5. Pide <code>size=1</code> y usa la primera fila de la lista: la de <code>values</code> o, si la respuesta la trae en <code>results</code>, como la describe la especificación, la de <code>results</code>. Cada magnitud se toma solo si su bandera <code>calidad_*</code> vale 1; si no, o si no llega ninguna fila, Inicio muestra 0.</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
@@ -858,7 +897,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 </div>
@@ -921,7 +960,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-crearMedidor" class="operacion">
@@ -978,7 +1017,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
-<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico. Un 429 (límite de peticiones del API) no se reparte por campos: desde la 1.10.5, donde la app lo muestra, lo hace con su propio aviso en español y no con el texto del servidor.</p>
 </div>
 </section>
 <section id="op-listarLluviometros" class="operacion">
@@ -1030,7 +1069,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-crearLluviometro" class="operacion">
@@ -1081,7 +1120,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
-<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico. Un 429 (límite de peticiones del API) no se reparte por campos: desde la 1.10.5, donde la app lo muestra, lo hace con su propio aviso en español y no con el texto del servidor.</p>
 </div>
 </section>
 </div>
@@ -1130,7 +1169,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-crearFavorito" class="operacion">
@@ -1176,7 +1215,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-eliminarFavorito" class="operacion">
@@ -1220,7 +1259,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-listarMunicipios" class="operacion">
@@ -1270,7 +1309,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-obtenerMunicipio" class="operacion">
@@ -1308,7 +1347,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-listarNoticias" class="operacion">
@@ -1354,7 +1393,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-listarActividades" class="operacion">
@@ -1412,7 +1451,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-listarMultimedia" class="operacion">
@@ -1430,6 +1469,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
 <tbody>
 <tr><td><code>size</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Tamaño de página de las listas paginadas.</p><p class="reglas">compartido: <a href="#parametro-size"><code>size</code></a></p></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Página, desde 1. La app la envía desde la segunda (<code>page=2</code>, <code>page=3</code>…); la primera la pide sin ella. La especificación 1.3.8 no la declara.</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -1483,7 +1523,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-listarDocumentos" class="operacion">
@@ -1495,13 +1535,14 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/tabs/Multimedia.js</code></dd>
 <dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
-<p>Documentos que el Programa publica para descargar. No traen <code>id</code> y <code>tipo</code> vale <code>DOCUMENTO</code>. <code>archivo</code> es el documento, que abre «DESCÁRGALO», y <code>portada</code> su carátula, que la app pinta como miniatura. La especificación no declara paginación; la app pide <code>size=100</code>, igual que en <code>/multimedias</code>, donde el API sí pagina. Si esta ruta falla, la pestaña sigue mostrando la multimedia.</p>
+<p>Documentos que el Programa publica para descargar. No traen <code>id</code> y <code>tipo</code> vale <code>DOCUMENTO</code>. <code>archivo</code> es el documento, que abre «DESCÁRGALO», y <code>portada</code> su carátula, que la app pinta como miniatura. La especificación no declara paginación; la app pide <code>size=100</code>, igual que en <code>/multimedias</code>, donde el API sí pagina, y si una página llega llena, la siguiente la pide con <code>page</code>. Si esta ruta falla, la pestaña sigue mostrando la multimedia. Desde la 1.10.5 la app llama a la ruta con barra final (<code>/documentos/</code>): sin ella el servidor responde con una redirección 301 hacia esa dirección, que añadía una petición a cada apertura de la pestaña. La especificación la escribe sin barra.</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
 <thead><tr><th>nombre</th><th>en</th><th>obligatorio</th><th>tipo</th><th>descripción</th></tr></thead>
 <tbody>
 <tr><td><code>size</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Tamaño de página de las listas paginadas.</p><p class="reglas">compartido: <a href="#parametro-size"><code>size</code></a></p></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Página, desde 1. La app la envía desde la segunda (<code>page=2</code>, <code>page=3</code>…); la primera la pide sin ella. La especificación 1.3.8 no la declara.</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -1529,7 +1570,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-listarPreguntasFrecuentes" class="operacion">
@@ -1577,7 +1618,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 </div>
@@ -1593,7 +1634,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>slices/observatorio.js</code>, <code>screens/observatorio/Listadoobs.js</code>, <code>screens/observatorio/Detalleobs.js</code></dd>
 <dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
-<p>Lo llama <code>listarObservaciones</code> (<code>slices/observatorio.js</code>) con <code>page</code> y <code>size</code>. El API responde hoy con <code>values</code> sin paginar; si un día pagina, <code>count</code>, <code>next</code> y <code>previous</code> pasan tal cual.</p>
+<p>Lo llama <code>listarObservaciones</code> (<code>slices/observatorio.js</code>) con <code>page</code> y <code>size</code>. El API responde hoy con <code>values</code> sin paginar; si un día pagina, <code>count</code>, <code>next</code> y <code>previous</code> pasan tal cual. Desde la 1.10.5.1 la pantalla del Observatorio pinta además cada observación en un mapa, en su <code>latitud</code> y su <code>longitud</code> (la que no trae unas coordenadas legibles no sale en él), rotulada con <code>tipo_nombre</code> y <code>actividad_nombre</code>; tocar el punto abre su detalle (<code>puntosDelMapa</code>, <code>screens/observatorio/Listadoobs.js</code>).</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
@@ -1637,7 +1678,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-crearObservatorio" class="operacion">
@@ -1645,11 +1686,11 @@ summary { cursor: pointer; color: var(--enlace); }
 <p class="resumen">Registrar una observación con fotografía</p>
 <dl class="datos">
 <dt>operationId</dt><dd><code>crearObservatorio</code></dd>
-<dt><code>x-estado</code></dt><dd>en uso</dd>
+<dt><code>x-estado</code></dt><dd>propuesto</dd>
 <dt><code>x-origen</code></dt><dd><code>slices/observatorio.js</code>, <code>screens/observatorio/Registroobs.js</code></dd>
-<dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
+<dt>Autenticación</dt><dd>opcional: <a href="#seguridad-bearer"><code>bearer</code></a> o sin credenciales</dd>
 </dl>
-<p>Única llamada multipart de la app: <code>crearObservacion</code> (<code>slices/observatorio.js</code>) envía el <code>FormData</code> armado por el formulario a través del cliente HTTP unificado, que añade el Bearer. La observación queda pendiente de aprobación por el Programa; la app comprueba <code>id</code> en la respuesta. El API solo exige <code>fecha</code>, <code>municipio</code>, <code>categoria</code>, <code>tipo</code> y <code>actividad</code>; la app exige además una <code>descripcion</code> de al menos 10 caracteres, sin contar los espacios de los extremos, y la <code>foto</code>, y sin ellas no envía la observación (<code>validarObservacion</code>, <code>slices/observatorio.js</code>). Es un criterio de la app, no del API: la descripción mínima cuida la calidad del dato y la foto es la evidencia visual de lo observado.</p>
+<p>Propuesta de la app para la 1.10.4: la operación con Bearer es la que la app llama desde la 1.10.3 y la especificación oficial la recoge. El Sistema debe confirmar el envío sin credenciales: sin sesión iniciada la app envía la misma observación sin Bearer y con un <code>correo</code> de contacto, y mientras no se confirme la operación entera figura como propuesta. Única llamada multipart de la app: <code>crearObservacion</code> (<code>slices/observatorio.js</code>) envía el <code>FormData</code> armado por el formulario a través del cliente HTTP unificado, que añade el Bearer si hay sesión. La observación queda pendiente de aprobación por el Programa; la app comprueba <code>id</code> en la respuesta. El API solo exige <code>fecha</code>, <code>municipio</code>, <code>categoria</code>, <code>tipo</code> y <code>actividad</code>; la app exige además una <code>descripcion</code> de al menos 10 caracteres, sin contar los espacios de los extremos, y la <code>foto</code>, y sin ellas no envía la observación (<code>validarObservacion</code>, <code>slices/observatorio.js</code>). Es un criterio de la app, no del API: la descripción mínima cuida la calidad del dato y la foto es la evidencia visual de lo observado. Si el servidor responde 401 o 403 al envío sin sesión en el acto, la pantalla pide iniciar sesión; si la observación esperaba en la cola sin red, la app la conserva con su foto y sin dueño, anota <code>retenido</code> en la bitácora, avisa a la persona, la reintenta sin sesión hasta el tope de intentos y después la deja en Perfil para reintentarla o descartarla; nunca con la cuenta de otra persona (<code>slices/colaSincronizacion.js</code>).</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>multipart/form-data</code></p>
@@ -1693,7 +1734,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
-<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico. Un 429 (límite de peticiones del API) no se reparte por campos: desde la 1.10.5, donde la app lo muestra, lo hace con su propio aviso en español y no con el texto del servidor.</p>
 </div>
 </section>
 <section id="op-obtenerObservatorio" class="operacion">
@@ -1741,7 +1782,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 </div>
@@ -1758,6 +1799,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
 <p>Propuesta de la app para la 1.10.2: tras obtener el token de notificaciones de Expo, la app lo asocia a la cuenta para que el Sistema le envíe las alertas de umbrales a través del servicio de notificaciones de Expo. Ruta en <code>DISPOSITIVOS_PATH</code> (<code>slices/constants.js</code>). El Sistema debe confirmar ruta, método y forma.</p>
+<p>Idempotencia por token (propuesto, pendiente de confirmación del Sistema): el servidor guarda el dispositivo por su <code>token</code>, así que un segundo POST con el mismo token actualiza ese registro (plataforma, versión, modelo, sistema) o lo deja igual, y no crea otro. La app cuenta con ello desde la 1.10.4: repite el POST ante un fallo pasajero (sin respuesta, 408, 429, 502, 503, 504) y cuando vuelve la conexión, y en cada inicio de sesión vuelve a registrar el mismo token (<code>registrarDispositivo</code>, <code>slices/notificaciones.js</code>).</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/json</code></p>
@@ -1795,7 +1837,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-eliminarDispositivo" class="operacion">
@@ -1808,6 +1850,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
 <p>Propuesta de la app para la 1.10.2: al cerrar sesión o desactivar las alertas, el token deja de recibir notificaciones. El Sistema debe confirmar ruta, método y forma.</p>
+<p>Idempotencia por token (propuesto, pendiente de confirmación del Sistema): dar de baja un token ya dado de baja, o nunca registrado, no borra nada más y responde con éxito; si respondiera 404, la app no reintenta y sigue con el cierre de sesión igual (en ambos casos el token queda sin registrar). La app repite el DELETE ante un fallo pasajero durante el cierre de sesión (<code>retirarDispositivo</code>, <code>slices/notificaciones.js</code>).</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
@@ -1831,7 +1874,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-obtenerUmbrales" class="operacion">
@@ -1872,7 +1915,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeCliente"><code>ErrorDeCliente</code></a></p>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 </div>
 </section>
 <section id="op-guardarUmbrales" class="operacion">
@@ -1924,7 +1967,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </div>
 <div class="respuesta error" data-codigo="4XX">
 <p class="titulo-respuesta"><span class="codigo">4XX</span> respuesta compartida <a href="#respuesta-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
-<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico. Un 429 (límite de peticiones del API) no se reparte por campos: desde la 1.10.5, donde la app lo muestra, lo hace con su propio aviso en español y no con el texto del servidor.</p>
 </div>
 </section>
 </div>
@@ -2110,7 +2153,8 @@ summary { cursor: pointer; color: var(--enlace); }
 <tbody>
 <tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td><p>Cliente OAuth2 de la app, inyectado en tiempo de compilación.</p></td></tr>
 <tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
-<tr><td><code>username</code></td><td><code>string</code> (email)</td><td>sí</td><td><p>Correo de la cuenta, en minúsculas.</p></td></tr>
+<tr><td><code>grant_type</code></td><td><code>string</code></td><td>no</td><td><p>Concesión OAuth2 de usuario y contraseña (<code>CONCESION_DE_INGRESO</code>, <code>slices/servicios/usuarios.js</code>). La app la envía siempre desde la 1.10.5.1, como el portal web; antes no la enviaba y el servicio la daba por supuesta. <code>LoginBody</code>, en la especificación 1.3.8, no la incluye.</p><p class="reglas">valores: <code>&quot;password&quot;</code></p></td></tr>
+<tr><td><code>username</code></td><td><code>string</code></td><td>sí</td><td><p>Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva <code>@</code>, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas.</p></td></tr>
 <tr><td><code>password</code></td><td><code>string</code> (password)</td><td>sí</td><td></td></tr>
 </tbody>
 </table>
@@ -2133,10 +2177,16 @@ summary { cursor: pointer; color: var(--enlace); }
     &quot;client_secret&quot;: {
       &quot;type&quot;: &quot;string&quot;
     },
+    &quot;grant_type&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;password&quot;
+      ],
+      &quot;description&quot;: &quot;Concesión OAuth2 de usuario y contraseña (`CONCESION_DE_INGRESO`, `slices/servicios/usuarios.js`). La app la envía siempre desde la 1.10.5.1, como el portal web; antes no la enviaba y el servicio la daba por supuesta. `LoginBody`, en la especificación 1.3.8, no la incluye.&quot;
+    },
     &quot;username&quot;: {
       &quot;type&quot;: &quot;string&quot;,
-      &quot;format&quot;: &quot;email&quot;,
-      &quot;description&quot;: &quot;Correo de la cuenta, en minúsculas.&quot;
+      &quot;description&quot;: &quot;Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva `@`, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas.&quot;
     },
     &quot;password&quot;: {
       &quot;type&quot;: &quot;string&quot;,
@@ -3223,7 +3273,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </section>
 <section id="esquema-Multimedia" class="esquema">
 <h3><code>Multimedia</code></h3>
-<p>Pieza de <code>GET /multimedias</code> en el API 1.3.8. No trae <code>tipo</code> ni <code>enlace</code>: el tipo va en cada archivo. La app abre el archivo principal (o el primero) y toma como miniatura la imagen principal (o la primera).</p>
+<p>Pieza de <code>GET /multimedias</code> en el API 1.3.8. No trae <code>tipo</code> ni <code>enlace</code>: el tipo va en cada archivo. La app toma como miniatura la imagen principal (o la primera). Desde la 1.10.5.1, tocar la pieza la abre dentro de la app (<code>components/VisorMultimedia.js</code>): una pieza con algún <code>Video</code> empieza por su video principal (o el primero), aunque traiga también una imagen; una de imagen, por su imagen principal (o la primera). Después, el visor recorre el resto de sus imágenes y videos (<code>elementosDeLaPieza</code>, <code>components/utils/enlaceDeDocumento.js</code>).</p>
 <div class="tabla">
 <table>
 <thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
@@ -3241,7 +3291,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <summary>JSON del esquema</summary>
 <pre class="json">{
   &quot;type&quot;: &quot;object&quot;,
-  &quot;description&quot;: &quot;Pieza de `GET /multimedias` en el API 1.3.8. No trae `tipo` ni `enlace`: el tipo va en cada archivo. La app abre el archivo principal (o el primero) y toma como miniatura la imagen principal (o la primera).&quot;,
+  &quot;description&quot;: &quot;Pieza de `GET /multimedias` en el API 1.3.8. No trae `tipo` ni `enlace`: el tipo va en cada archivo. La app toma como miniatura la imagen principal (o la primera). Desde la 1.10.5.1, tocar la pieza la abre dentro de la app (`components/VisorMultimedia.js`): una pieza con algún `Video` empieza por su video principal (o el primero), aunque traiga también una imagen; una de imagen, por su imagen principal (o la primera). Después, el visor recorre el resto de sus imágenes y videos (`elementosDeLaPieza`, `components/utils/enlaceDeDocumento.js`).&quot;,
   &quot;required&quot;: [
     &quot;id&quot;,
     &quot;titulo&quot;,
@@ -3282,7 +3332,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <tr><td><code>id</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
 <tr><td><code>tipo</code></td><td><code>string</code></td><td>sí</td><td><p>La app lo compara sin distinguir mayúsculas.</p><p class="reglas">valores: <code>&quot;Imagen&quot;</code>, <code>&quot;Video&quot;</code></p></td></tr>
 <tr><td><code>archivo</code></td><td><code>string</code> (uri)</td><td>sí</td><td></td></tr>
-<tr><td><code>es_principal</code></td><td><code>boolean</code></td><td>no</td><td></td></tr>
+<tr><td><code>es_principal</code></td><td><code>boolean</code> o <code>string</code></td><td>no</td><td><p>La especificación 1.3.8 lo declara booleano; en producción también llega como texto («True», «False»). Desde la 1.10.5.1 la app lee las dos formas al elegir el archivo que abre la pieza: es principal con <code>true</code> o con el texto «True», sin distinguir mayúsculas (<code>esPrincipal</code>, <code>components/utils/enlaceDeDocumento.js</code>).</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -3311,7 +3361,15 @@ summary { cursor: pointer; color: var(--enlace); }
       &quot;format&quot;: &quot;uri&quot;
     },
     &quot;es_principal&quot;: {
-      &quot;type&quot;: &quot;boolean&quot;
+      &quot;oneOf&quot;: [
+        {
+          &quot;type&quot;: &quot;boolean&quot;
+        },
+        {
+          &quot;type&quot;: &quot;string&quot;
+        }
+      ],
+      &quot;description&quot;: &quot;La especificación 1.3.8 lo declara booleano; en producción también llega como texto («True», «False»). Desde la 1.10.5.1 la app lee las dos formas al elegir el archivo que abre la pieza: es principal con `true` o con el texto «True», sin distinguir mayúsculas (`esPrincipal`, `components/utils/enlaceDeDocumento.js`).&quot;
     }
   }
 }</pre>
@@ -3615,6 +3673,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <tr><td><code>latitud</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
 <tr><td><code>foto</code></td><td><code>string</code> (binary)</td><td>sí</td><td><p>Fotografía JPEG tomada con la cámara.</p></td></tr>
 <tr><td><code>municipio</code></td><td><code>integer</code></td><td>sí</td><td></td></tr>
+<tr><td><code>correo</code></td><td><code>string</code> (email)</td><td>no</td><td><p>Solo en el envío sin sesión: correo de contacto, en minúsculas y sin espacios en los bordes.</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -3665,6 +3724,11 @@ summary { cursor: pointer; color: var(--enlace); }
     },
     &quot;municipio&quot;: {
       &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;correo&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;email&quot;,
+      &quot;description&quot;: &quot;Solo en el envío sin sesión: correo de contacto, en minúsculas y sin espacios en los bordes.&quot;
     }
   }
 }</pre>
@@ -3825,7 +3889,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </section>
 <section id="respuesta-ErrorDeCliente" class="compartido">
 <h3><code>ErrorDeCliente</code></h3>
-<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio.</p>
+<p>Error del cliente distinto de 401. La app muestra <code>detail</code>, <code>error</code>, <code>errors</code> o <code>non_field_errors</code> cuando vienen; si el cuerpo no es JSON, muestra un mensaje propio. Desde la 1.10.5, donde la app muestra ese texto, un 429 (límite de peticiones del API, <code>{&quot;detail&quot;: &quot;Too Many Requests&quot;}</code>) lleva en su lugar su propio aviso en español (<code>slices/errores.js</code>).</p>
 <p class="medio"><code>application/json</code></p>
 <p>Esquema: <a href="#esquema-Error"><code>Error</code></a></p>
 <p class="rotulo">Ejemplo</p>
@@ -3835,7 +3899,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </section>
 <section id="respuesta-ErrorDeValidacion" class="compartido">
 <h3><code>ErrorDeValidacion</code></h3>
-<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico.</p>
+<p>Error de validación de un formulario: además de las claves de <code>Error</code>, el cuerpo puede traer mensajes por campo (<code>{ campo: 'mensaje' }</code> o <code>{ campo: ['mensaje'] }</code>), que la app muestra para que la persona sepa qué corregir: el texto de cada campo que el formulario pinta va bajo ese campo; <code>detail</code>, <code>non_field_errors</code> y las claves que el formulario no muestra van en el recuadro de avisos del formulario, sin el nombre de la clave. Si el cuerpo no trae ningún texto legible, la app muestra su aviso genérico. Un 429 (límite de peticiones del API) no se reparte por campos: desde la 1.10.5, donde la app lo muestra, lo hace con su propio aviso en español y no con el texto del servidor.</p>
 <p class="medio"><code>application/json</code></p>
 <p>Esquema: <a href="#esquema-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
 <p class="rotulo">Ejemplo</p>
