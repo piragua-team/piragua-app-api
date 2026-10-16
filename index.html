@@ -91,8 +91,8 @@ summary { cursor: pointer; color: var(--enlace); }
 <!-- Generado por bin/generar-manual-api.mjs a partir del contrato OpenAPI. No se edita a mano: se cambia el contrato y se regenera. -->
 <header id="inicio">
 <h1>API institucional Piragua: rutas que consume la app móvil</h1>
-<p class="meta">Versión del contrato <code>1.10.5.1</code> · OpenAPI <code>3.0.3</code> · 31 operaciones · 45 esquemas</p>
-<p>Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. La versión del contrato es la de la app que describe, la 1.10.5.1; en iOS ese mismo código lleva el número 1.10.5 (build 9), porque Apple solo admite tres números en la versión. Cada operación lleva dos extensiones: <code>x-estado</code>, que vale <code>en uso</code> cuando el código del árbol la llama hoy y <code>propuesto</code> cuando es un contrato que la app necesita y el Sistema todavía tiene que confirmar; y <code>x-origen</code>, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es <code>type: object</code> con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba <code>__tests__/openapi-app.test.js</code> cruza las rutas de <code>slices/</code> contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (<code>__tests__/openapi-ejemplos.test.js</code> comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en <code>docs/FORMULARIOS.md</code>, y <code>__tests__/formularios-doc.test.js</code> las ata a <code>validarLluvia</code> y a <code>slices/constants.js</code>. El manual de referencia en HTML, <code>docs/api/index.html</code>, se genera desde este contrato con <code>node bin/generar-manual-api.mjs</code>; <code>__tests__/manual-api.test.js</code> falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8 (también en <code>x-version-api</code>), la de la especificación oficial del Programa, publicada en https://piragua.corantioquia.gov.co/developers/api.yaml; los códigos de respuesta, la ruta <code>/documentos</code> y la forma de <code>/multimedias</code> salen de esa especificación. El cotejo operación por operación, con las diferencias y a quién le toca cada una, está en <code>docs/CONTRATO-API.md</code>.</p>
+<p class="meta">Versión del contrato <code>1.10.6</code> · OpenAPI <code>3.0.3</code> · 31 operaciones · 45 esquemas</p>
+<p>Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. La versión del contrato es la de la app que describe, la 1.10.6, con el mismo nombre en las dos tiendas: publicada en Google Play el 2026-10-15 y en revisión en la App Store. Lo que cambia respecto de la 1.10.5.1, que en iOS lleva el número 1.10.5 (build 9) porque Apple solo admite tres números en la versión, va marcado «desde la 1.10.6». Cada operación lleva dos extensiones: <code>x-estado</code>, que vale <code>en uso</code> cuando el código del árbol la llama hoy y <code>propuesto</code> cuando es un contrato que la app necesita y el Sistema todavía tiene que confirmar; y <code>x-origen</code>, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es <code>type: object</code> con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba <code>__tests__/openapi-app.test.js</code> cruza las rutas de <code>slices/</code> contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (<code>__tests__/openapi-ejemplos.test.js</code> comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en <code>docs/FORMULARIOS.md</code>, y <code>__tests__/formularios-doc.test.js</code> las ata a <code>validarLluvia</code> y a <code>slices/constants.js</code>. El manual de referencia en HTML, <code>docs/api/index.html</code>, se genera desde este contrato con <code>node bin/generar-manual-api.mjs</code>; <code>__tests__/manual-api.test.js</code> falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8 (también en <code>x-version-api</code>), la de la especificación oficial del Programa, publicada en https://piragua.corantioquia.gov.co/developers/api.yaml; los códigos de respuesta, la ruta <code>/documentos</code> y la forma de <code>/multimedias</code> salen de esa especificación. El cotejo operación por operación, con las diferencias y a quién le toca cada una, está en <code>docs/CONTRATO-API.md</code>.</p>
 <p class="nota">Página generada por <code>bin/generar-manual-api.mjs</code> a partir de <code>docs/openapi-app.json</code>. No se edita a mano: se cambia el contrato y se regenera; <code>__tests__/manual-api.test.js</code> falla si el manual guardado no corresponde al contrato.</p>
 </header>
 <nav id="indice" aria-label="Índice">
@@ -197,7 +197,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/auth/Signin.js</code>, <code>screens/auth/Signup.js</code></dd>
 <dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
 </dl>
-<p>La app envía en el cuerpo JSON las credenciales del cliente OAuth2, la concesión <code>grant_type</code> con el valor <code>password</code> y las de la persona: en <code>username</code>, su nombre de usuario o su correo, y en <code>password</code>, su contraseña. Desde la 1.10.5.1 la pantalla de ingreso acepta el usuario o el correo (antes exigía un correo) y el cuerpo declara <code>grant_type</code>, como hace el portal web ante el mismo servicio (<code>docs/CONTRATO-API.md</code>, A-06). La respuesta es el usuario completo con un bloque <code>oauth2</code> que trae el <code>access_token</code>; la app guarda en el teléfono solo los campos de <code>ESQUEMA_DE_SESION</code> (<code>context/sessionStorage.js</code>), y el <code>refresh_token</code> lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (<code>slices/tokenDeRenovacion.js</code>) para renovar el token de acceso con <code>/oauth2/token/</code>. <code>screens/auth/Signup.js</code> inicia sesión por la misma ruta y con el mismo servicio (<code>iniciarSesion</code>, <code>slices/servicios/usuarios.js</code>) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene.</p>
+<p>La app envía en el cuerpo JSON las credenciales del cliente OAuth2, la concesión <code>grant_type</code> con el valor <code>password</code> y las de la persona: en <code>username</code>, su nombre de usuario o su correo, y en <code>password</code>, su contraseña. Desde la 1.10.5.1 la pantalla de ingreso acepta el usuario o el correo (antes exigía un correo) y el cuerpo declara <code>grant_type</code>, como hace el portal web ante el mismo servicio (<code>docs/CONTRATO-API.md</code>, A-06). La respuesta es el usuario completo con un bloque <code>oauth2</code> que trae el <code>access_token</code>; la app guarda en el teléfono solo los campos de <code>ESQUEMA_DE_SESION</code> (<code>context/sessionStorage.js</code>), y el <code>refresh_token</code> lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (<code>slices/tokenDeRenovacion.js</code>) para renovar el token de acceso con <code>/oauth2/token/</code>. <code>screens/auth/Signup.js</code> inicia sesión por la misma ruta y con el mismo servicio (<code>iniciarSesion</code>, <code>slices/servicios/usuarios.js</code>) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene. El servicio distingue mayúsculas en <code>username</code> (medido el 2026-10-14: el usuario de prueba tal cual entra y en mayúsculas recibe 400 «Credencial invalida»). Desde la 1.10.6, si el servicio rechaza las credenciales (<code>invalid_grant</code> o <code>Credencial invalida</code>) y lo escrito no es lo que se envió, porque era un correo con mayúsculas, la app repite el ingreso una sola vez con lo escrito tal cual; ningún otro fallo lo repite (<code>docs/CONTRATO-API.md</code>, S-14 y A-10).</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/json</code></p>
@@ -511,7 +511,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/auth/Forgot.js</code></dd>
 <dt>Autenticación</dt><dd>ninguna: la operación no lleva credenciales</dd>
 </dl>
-<p>Recibe en <code>username</code> el nombre de usuario o el correo de la cuenta, normalizado como en <code>POST /login</code>, junto con las credenciales del cliente: lo mismo que manda el portal web. Desde la 1.10.5.1 la pantalla pide el usuario o el correo; antes exigía un correo. La app da la solicitud por aceptada cuando la respuesta trae <code>ok</code>; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse.</p>
+<p>Recibe en <code>username</code> el nombre de usuario o el correo de la cuenta, normalizado como en <code>POST /login</code>, junto con las credenciales del cliente: lo mismo que manda el portal web. Desde la 1.10.5.1 la pantalla pide el usuario o el correo; antes exigía un correo. La app da la solicitud por aceptada cuando la respuesta trae <code>ok</code>; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse. Desde la 1.10.6, ante el 400 de usuario no encontrado y si lo escrito no es lo que se envió, porque era un correo con mayúsculas, la app repite la petición una sola vez con lo escrito tal cual; ningún otro fallo la repite. Con una cuenta que existe, el servicio respondió 500 sin cuerpo JSON las dos veces que se midió (2026-10-14) y la contraseña no cambió: la app muestra su aviso de que no fue posible procesar la solicitud (<code>docs/CONTRATO-API.md</code>, S-15 y A-10).</p>
 <h5>Cuerpo de la petición</h5>
 <p>Obligatorio.</p>
 <p class="medio"><code>application/json</code></p>
@@ -522,7 +522,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <tbody>
 <tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
 <tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
-<tr><td><code>username</code></td><td><code>string</code></td><td>sí</td><td><p>Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva <code>@</code>, en minúsculas, como en <code>POST /login</code>.</p></td></tr>
+<tr><td><code>username</code></td><td><code>string</code></td><td>sí</td><td><p>Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva <code>@</code>, en minúsculas, como en <code>POST /login</code>. Si el servicio no encuentra un correo así normalizado y lo escrito tenía mayúsculas, la app repite la petición una vez con lo escrito tal cual (desde la 1.10.6).</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -544,7 +544,7 @@ summary { cursor: pointer; color: var(--enlace); }
     },
     &quot;username&quot;: {
       &quot;type&quot;: &quot;string&quot;,
-      &quot;description&quot;: &quot;Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva `@`, en minúsculas, como en `POST /login`.&quot;
+      &quot;description&quot;: &quot;Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva `@`, en minúsculas, como en `POST /login`. Si el servicio no encuentra un correo así normalizado y lo escrito tenía mayúsculas, la app repite la petición una vez con lo escrito tal cual (desde la 1.10.6).&quot;
     }
   }
 }</pre>
@@ -858,7 +858,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/home/Home.js</code></dd>
 <dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
-<p>La ruta lleva la barra final de la especificación (<code>/estaciones/{codigo}/meteorologia/{frecuencia}/</code>): sin ella el servidor responde con una redirección 301, que añade una petición más a Inicio. La app la llama así desde la 1.10.5. Pide <code>size=1</code> y usa la primera fila de la lista: la de <code>values</code> o, si la respuesta la trae en <code>results</code>, como la describe la especificación, la de <code>results</code>. Cada magnitud se toma solo si su bandera <code>calidad_*</code> vale 1; si no, o si no llega ninguna fila, Inicio muestra 0.</p>
+<p>La ruta lleva la barra final de la especificación (<code>/estaciones/{codigo}/meteorologia/{frecuencia}/</code>): sin ella el servidor responde con una redirección 301, que añade una petición más a Inicio. La app la llama así desde la 1.10.5. Pide <code>size=1</code> y usa la primera fila de la lista: la de <code>values</code> o, si la respuesta la trae en <code>results</code>, como la describe la especificación, la de <code>results</code>. Cada magnitud se toma solo si su bandera <code>calidad_*</code> vale 1 y trae un número; si no, Inicio muestra «—» (hasta la 1.10.5.1, 0). Desde la 1.10.6, Inicio lee además el día del dato, los diez primeros caracteres de <code>fecha</code>, y lo compara con la fecha del teléfono: con el dato de hoy rotula «Lluvia hoy»; de uno a tres días antes, «Lluvia del 12 de oct.» y, bajo la estación, «Último dato: 12 de octubre»; más viejo, sin <code>fecha</code> legible o sin ninguna fila, «—» en las tres cifras y «Sin datos recientes de esta estación». Las magnitudes llegan como texto con decimales (medido el 2026-10-14) y la app las lee como número sin truncarlas: la lluvia con un decimal como mucho, y la temperatura y la humedad redondeadas a entero.</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
@@ -881,11 +881,12 @@ summary { cursor: pointer; color: var(--enlace); }
   &quot;previous&quot;: null,
   &quot;values&quot;: [
     {
-      &quot;lluvia&quot;: 4.2,
+      &quot;fecha&quot;: &quot;2026-10-13&quot;,
+      &quot;lluvia&quot;: &quot;4.2&quot;,
       &quot;calidad_lluvia&quot;: 1,
-      &quot;temperatura&quot;: 21.7,
+      &quot;temperatura&quot;: &quot;21.7&quot;,
       &quot;calidad_temperatura&quot;: 1,
-      &quot;humedad_relativa&quot;: 78,
+      &quot;humedad_relativa&quot;: &quot;78.4&quot;,
       &quot;calidad_humedad_relativa&quot;: 1
     }
   ]
@@ -910,9 +911,10 @@ summary { cursor: pointer; color: var(--enlace); }
 <dl class="datos">
 <dt>operationId</dt><dd><code>listarMedidores</code></dd>
 <dt><code>x-estado</code></dt><dd>en uso</dd>
-<dt><code>x-origen</code></dt><dd><code>screens/stations/Estaciones.js</code></dd>
+<dt><code>x-origen</code></dt><dd><code>screens/stations/Estaciones.js</code>, <code>slices/medidoresGuardados.js</code></dd>
 <dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
+<p>Desde la 1.10.6, cada lista que llega con un 200 se guarda en el teléfono, una copia por cuenta y solo con los campos que lee la app (<code>slices/medidoresGuardados.js</code>): «Tus lluviómetros» la muestra mientras llega la del servidor y, si el servidor no responde, la deja a la vista con un aviso. Un 200 sin <code>values</code> ni <code>results</code> no se toma como lista vacía. El cierre de sesión, también el que sigue a eliminar la cuenta, borra las copias.</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
@@ -972,7 +974,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/stations/Registroestacion.js</code></dd>
 <dt>Autenticación</dt><dd><a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
-<p>El campo del formulario <code>fuente</code> viaja como <code>predio</code>. Las coordenadas salen del GPS del teléfono con siete decimales y viajan como número; la altitud, redondeada a entero. La estación queda pendiente de aprobación por el Programa.</p>
+<p>El campo del formulario <code>fuente</code> viaja como <code>predio</code>. Las coordenadas salen del GPS del teléfono con siete decimales y viajan como número; la altitud, redondeada a entero. Desde la 1.10.6 el cuerpo lleva también <code>municipio</code> y <code>territorial</code>, los ids del catálogo de municipios (<code>GET /municipios?simple=1</code>) para el municipio elegido en el formulario, que llega marcado con el del perfil: el servicio los exige y no los deduce de las coordenadas (medido el 2026-10-14; <code>docs/CONTRATO-API.md</code>, fila 9 y S-12). Sin el catálogo, o sin el territorial del municipio elegido, la pantalla no envía ni encola el alta: avisa que no se pudieron cargar los municipios, pide revisar la conexión e intentarlo de nuevo, y quita el aviso cuando llega el catálogo. La estación queda pendiente de aprobación por el Programa.</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
@@ -993,7 +995,9 @@ summary { cursor: pointer; color: var(--enlace); }
   &quot;latitud&quot;: 6.2518,
   &quot;longitud&quot;: -75.5636,
   &quot;altitud&quot;: 1495,
-  &quot;version_formulario&quot;: &quot;2&quot;
+  &quot;municipio&quot;: 2,
+  &quot;territorial&quot;: 4,
+  &quot;version_formulario&quot;: &quot;3&quot;
 }</pre>
 <h5>Respuestas</h5>
 <div class="respuesta" data-codigo="201">
@@ -1009,6 +1013,20 @@ summary { cursor: pointer; color: var(--enlace); }
   &quot;activo&quot;: false,
   &quot;latitud&quot;: 6.2518,
   &quot;longitud&quot;: -75.5636
+}</pre>
+</div>
+<div class="respuesta error" data-codigo="400">
+<p class="titulo-respuesta"><span class="codigo">400</span> Validación del servicio. Con el cuerpo vacío responde 400 con <code>latitud</code>, <code>longitud</code>, <code>municipio</code> y <code>territorial</code> (sonda del 2026-10-14). Ese día, en producción, un alta real desde la app, con todos los campos del formulario llenos y sin <code>municipio</code> ni <code>territorial</code>, que la app aún no enviaba, fue rechazada con «Este campo es requerido.» en cada uno; el registro de esa prueba guarda el texto de la pantalla, no el código HTTP. Desde la 1.10.6 la pantalla los envía, y si el servicio rechaza alguno de los dos, el aviso sale junto al selector de municipio y no en el recuadro del formulario.</p>
+<p class="medio"><code>application/json</code></p>
+<p>Esquema: <a href="#esquema-ErrorDeValidacion"><code>ErrorDeValidacion</code></a></p>
+<p class="rotulo">Ejemplo</p>
+<pre class="ejemplo">{
+  &quot;municipio&quot;: [
+    &quot;Este campo es requerido.&quot;
+  ],
+  &quot;territorial&quot;: [
+    &quot;Este campo es requerido.&quot;
+  ]
 }</pre>
 </div>
 <div class="respuesta error" data-codigo="401">
@@ -1380,9 +1398,10 @@ summary { cursor: pointer; color: var(--enlace); }
   &quot;previous&quot;: null,
   &quot;values&quot;: [
     {
-      &quot;id&quot;: 12,
+      &quot;id&quot;: &quot;12&quot;,
       &quot;titulo&quot;: &quot;Jornada de monitoreo comunitario&quot;,
-      &quot;imagen&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/noticias/jornada.jpg&quot;
+      &quot;imagen&quot;: &quot;https://geopiragua.corantioquia.gov.co/media/noticias/jornada.jpg&quot;,
+      &quot;fecha_publicacion&quot;: &quot;2026-10-01&quot;
     }
   ]
 }</pre>
@@ -1405,7 +1424,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <dt><code>x-origen</code></dt><dd><code>screens/tabs/Events.js</code></dd>
 <dt>Autenticación</dt><dd>opcional: sin credenciales o <a href="#seguridad-bearer"><code>bearer</code></a></dd>
 </dl>
-<p>La pantalla de actividades hace tres llamadas seguidas: por año, por año y mes, y por año, mes y semana. Separa los elementos por <code>tipo</code> (<code>Evento</code> frente al resto).</p>
+<p>La pantalla de actividades pide, una tras otra, las del año, las del mes y las de la semana en curso. Separa los elementos por <code>tipo</code> (<code>Evento</code> frente al resto). Desde la 1.10.6, la semana es la ISO 8601 y se pide con el año y el mes de sus días: el servicio cuenta <code>week</code> como semana ISO y la aplica junto con <code>month</code> (medido el 2026-10-14: <code>year=2026&amp;month=5&amp;week=19</code> devuelve las actividades del lunes 4 y el jueves 7 de mayo y no las del lunes 11; <code>year=2026&amp;month=4&amp;week=18</code>, las del 27 y el 29 de abril, y <code>year=2026&amp;month=5&amp;week=18</code>, ninguna). Una semana que empieza en un mes y acaba en otro, o en otro año, se pide en dos consultas a la vez: la semana 53 de 2026, del 28 de diciembre al 3 de enero, son <code>year=2026&amp;month=12&amp;week=53</code> y <code>year=2027&amp;month=1&amp;week=53</code>.</p>
 <h5>Parámetros</h5>
 <div class="tabla">
 <table>
@@ -1413,7 +1432,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <tbody>
 <tr><td><code>year</code></td><td>query</td><td>sí</td><td><code>integer</code></td><td></td></tr>
 <tr><td><code>month</code></td><td>query</td><td>no</td><td><code>integer</code></td><td></td></tr>
-<tr><td><code>week</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Semana del año calculada por la app.</p></td></tr>
+<tr><td><code>week</code></td><td>query</td><td>no</td><td><code>integer</code></td><td><p>Semana ISO 8601 (de lunes a domingo; la semana 1 es la del primer jueves del año), como la cuenta el servicio. Hasta la 1.10.5.1 la app usaba una cuenta propia que en 2026 daba la semana anterior los lunes y la siguiente los sábados.</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -2154,7 +2173,7 @@ summary { cursor: pointer; color: var(--enlace); }
 <tr><td><code>client_id</code></td><td><code>string</code></td><td>sí</td><td><p>Cliente OAuth2 de la app, inyectado en tiempo de compilación.</p></td></tr>
 <tr><td><code>client_secret</code></td><td><code>string</code></td><td>sí</td><td></td></tr>
 <tr><td><code>grant_type</code></td><td><code>string</code></td><td>no</td><td><p>Concesión OAuth2 de usuario y contraseña (<code>CONCESION_DE_INGRESO</code>, <code>slices/servicios/usuarios.js</code>). La app la envía siempre desde la 1.10.5.1, como el portal web; antes no la enviaba y el servicio la daba por supuesta. <code>LoginBody</code>, en la especificación 1.3.8, no la incluye.</p><p class="reglas">valores: <code>&quot;password&quot;</code></p></td></tr>
-<tr><td><code>username</code></td><td><code>string</code></td><td>sí</td><td><p>Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva <code>@</code>, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas.</p></td></tr>
+<tr><td><code>username</code></td><td><code>string</code></td><td>sí</td><td><p>Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva <code>@</code>, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas. Si el servicio rechaza un correo así normalizado y lo escrito tenía mayúsculas, la app repite el ingreso una vez con lo escrito tal cual (desde la 1.10.6).</p></td></tr>
 <tr><td><code>password</code></td><td><code>string</code> (password)</td><td>sí</td><td></td></tr>
 </tbody>
 </table>
@@ -2186,7 +2205,7 @@ summary { cursor: pointer; color: var(--enlace); }
     },
     &quot;username&quot;: {
       &quot;type&quot;: &quot;string&quot;,
-      &quot;description&quot;: &quot;Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva `@`, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas.&quot;
+      &quot;description&quot;: &quot;Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva `@`, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas. Si el servicio rechaza un correo así normalizado y lo escrito tenía mayúsculas, la app repite el ingreso una vez con lo escrito tal cual (desde la 1.10.6).&quot;
     },
     &quot;password&quot;: {
       &quot;type&quot;: &quot;string&quot;,
@@ -2694,11 +2713,12 @@ summary { cursor: pointer; color: var(--enlace); }
 <table>
 <thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
 <tbody>
-<tr><td><code>lluvia</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+<tr><td><code>fecha</code></td><td><code>string</code></td><td>no</td><td><p>Día del resumen, <code>AAAA-MM-DD</code> al comienzo de la cadena. Inicio compara sus diez primeros caracteres con la fecha del teléfono para decir de qué día es el dato (desde la 1.10.6).</p></td></tr>
+<tr><td><code>lluvia</code></td><td><code>string</code></td><td>no</td><td><p>Milímetros. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número.</p></td></tr>
 <tr><td><code>calidad_lluvia</code></td><td><code>integer</code></td><td>no</td><td><p>1 cuando el dato es válido.</p></td></tr>
-<tr><td><code>temperatura</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+<tr><td><code>temperatura</code></td><td><code>string</code></td><td>no</td><td><p>Grados Celsius. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número.</p></td></tr>
 <tr><td><code>calidad_temperatura</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
-<tr><td><code>humedad_relativa</code></td><td><code>number</code></td><td>no</td><td></td></tr>
+<tr><td><code>humedad_relativa</code></td><td><code>string</code></td><td>no</td><td><p>Por ciento. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número.</p></td></tr>
 <tr><td><code>calidad_humedad_relativa</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
 </tbody>
 </table>
@@ -2708,21 +2728,28 @@ summary { cursor: pointer; color: var(--enlace); }
 <pre class="json">{
   &quot;type&quot;: &quot;object&quot;,
   &quot;properties&quot;: {
+    &quot;fecha&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Día del resumen, `AAAA-MM-DD` al comienzo de la cadena. Inicio compara sus diez primeros caracteres con la fecha del teléfono para decir de qué día es el dato (desde la 1.10.6).&quot;
+    },
     &quot;lluvia&quot;: {
-      &quot;type&quot;: &quot;number&quot;
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Milímetros. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número.&quot;
     },
     &quot;calidad_lluvia&quot;: {
       &quot;type&quot;: &quot;integer&quot;,
       &quot;description&quot;: &quot;1 cuando el dato es válido.&quot;
     },
     &quot;temperatura&quot;: {
-      &quot;type&quot;: &quot;number&quot;
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Grados Celsius. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número.&quot;
     },
     &quot;calidad_temperatura&quot;: {
       &quot;type&quot;: &quot;integer&quot;
     },
     &quot;humedad_relativa&quot;: {
-      &quot;type&quot;: &quot;number&quot;
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Por ciento. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número.&quot;
     },
     &quot;calidad_humedad_relativa&quot;: {
       &quot;type&quot;: &quot;integer&quot;
@@ -2820,7 +2847,7 @@ summary { cursor: pointer; color: var(--enlace); }
 </section>
 <section id="esquema-MedidorNuevo" class="esquema">
 <h3><code>MedidorNuevo</code></h3>
-<p>Alta de una estación de lluvia tal como la arma <code>screens/stations/Registroestacion.js</code>. Campos obligatorios, rangos y política de versiones en <code>docs/FORMULARIOS.md</code>.</p>
+<p>Alta de una estación de lluvia tal como la arma <code>screens/stations/Registroestacion.js</code>. Desde la 1.10.6 lleva <code>municipio</code> y <code>territorial</code>, que el servicio exige. Campos obligatorios, rangos y política de versiones en <code>docs/FORMULARIOS.md</code>.</p>
 <div class="tabla">
 <table>
 <thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
@@ -2830,7 +2857,9 @@ summary { cursor: pointer; color: var(--enlace); }
 <tr><td><code>latitud</code></td><td><code>number</code></td><td>sí</td><td><p>Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de <code>x-minimo</code> y <code>x-maximo</code>.</p><p class="reglas"><code>x-minimo</code>: <code>-90</code> · <code>x-maximo</code>: <code>90</code> · <code>x-unidad</code>: <code>&quot;grados&quot;</code></p></td></tr>
 <tr><td><code>longitud</code></td><td><code>number</code></td><td>sí</td><td><p>Siete decimales cuando la llena el GPS. La pantalla la convierte a número antes de enviarla y no envía un valor fuera de <code>x-minimo</code> y <code>x-maximo</code>.</p><p class="reglas"><code>x-minimo</code>: <code>-180</code> · <code>x-maximo</code>: <code>180</code> · <code>x-unidad</code>: <code>&quot;grados&quot;</code></p></td></tr>
 <tr><td><code>altitud</code></td><td><code>integer</code></td><td>sí</td><td><p>Metros. La pantalla redondea la que se escribe con decimales y no envía el alta sin ella: la especificación del API 1.3.8 la exige.</p><p class="reglas"><code>x-unidad</code>: <code>&quot;metros&quot;</code></p></td></tr>
-<tr><td><code>version_formulario</code></td><td><code>string</code></td><td>no</td><td><p>Versión del formulario que originó el registro: <code>VERSION_FORMULARIO_MEDIDOR</code> de <code>slices/constants.js</code>, que el servicio añade al cuerpo. Se sube según la política de <code>docs/FORMULARIOS.md</code>.</p></td></tr>
+<tr><td><code>municipio</code></td><td><code>integer</code></td><td>sí</td><td><p>Id del municipio donde está el lluviómetro: el <code>id</code> de su fila en el catálogo <code>GET /municipios?simple=1</code>. El formulario lo pide con una lista que llega marcada con el municipio del perfil (el <code>municipio</code> que trae el ingreso) y que la persona puede cambiar. El servicio lo exige: sin él responde 400 con «Este campo es requerido.» (medido el 2026-10-14). Desde la 1.10.6.</p></td></tr>
+<tr><td><code>territorial</code></td><td><code>integer</code></td><td>sí</td><td><p>Id de la territorial de ese municipio: el <code>territorial</code> de la misma fila del catálogo. No se escribe en el formulario. El servicio lo exige y no lo deduce de las coordenadas (medido el 2026-10-14). Desde la 1.10.6.</p></td></tr>
+<tr><td><code>version_formulario</code></td><td><code>string</code></td><td>no</td><td><p>Versión del formulario que originó el registro: <code>VERSION_FORMULARIO_MEDIDOR</code> de <code>slices/constants.js</code>, que el servicio añade al cuerpo. Se sube según la política de <code>docs/FORMULARIOS.md</code>: es <code>'3'</code> desde la 1.10.6, que añade <code>municipio</code> y <code>territorial</code>; la 1.10.5.1 (en la App Store, la 1.10.5 build 9) envía <code>'2'</code>.</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -2838,13 +2867,15 @@ summary { cursor: pointer; color: var(--enlace); }
 <summary>JSON del esquema</summary>
 <pre class="json">{
   &quot;type&quot;: &quot;object&quot;,
-  &quot;description&quot;: &quot;Alta de una estación de lluvia tal como la arma `screens/stations/Registroestacion.js`. Campos obligatorios, rangos y política de versiones en `docs/FORMULARIOS.md`.&quot;,
+  &quot;description&quot;: &quot;Alta de una estación de lluvia tal como la arma `screens/stations/Registroestacion.js`. Desde la 1.10.6 lleva `municipio` y `territorial`, que el servicio exige. Campos obligatorios, rangos y política de versiones en `docs/FORMULARIOS.md`.&quot;,
   &quot;required&quot;: [
     &quot;predio&quot;,
     &quot;ubicacion&quot;,
     &quot;latitud&quot;,
     &quot;longitud&quot;,
-    &quot;altitud&quot;
+    &quot;altitud&quot;,
+    &quot;municipio&quot;,
+    &quot;territorial&quot;
   ],
   &quot;properties&quot;: {
     &quot;predio&quot;: {
@@ -2873,9 +2904,17 @@ summary { cursor: pointer; color: var(--enlace); }
       &quot;description&quot;: &quot;Metros. La pantalla redondea la que se escribe con decimales y no envía el alta sin ella: la especificación del API 1.3.8 la exige.&quot;,
       &quot;x-unidad&quot;: &quot;metros&quot;
     },
+    &quot;municipio&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;description&quot;: &quot;Id del municipio donde está el lluviómetro: el `id` de su fila en el catálogo `GET /municipios?simple=1`. El formulario lo pide con una lista que llega marcada con el municipio del perfil (el `municipio` que trae el ingreso) y que la persona puede cambiar. El servicio lo exige: sin él responde 400 con «Este campo es requerido.» (medido el 2026-10-14). Desde la 1.10.6.&quot;
+    },
+    &quot;territorial&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;description&quot;: &quot;Id de la territorial de ese municipio: el `territorial` de la misma fila del catálogo. No se escribe en el formulario. El servicio lo exige y no lo deduce de las coordenadas (medido el 2026-10-14). Desde la 1.10.6.&quot;
+    },
     &quot;version_formulario&quot;: {
       &quot;type&quot;: &quot;string&quot;,
-      &quot;description&quot;: &quot;Versión del formulario que originó el registro: `VERSION_FORMULARIO_MEDIDOR` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`.&quot;
+      &quot;description&quot;: &quot;Versión del formulario que originó el registro: `VERSION_FORMULARIO_MEDIDOR` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`: es `'3'` desde la 1.10.6, que añade `municipio` y `territorial`; la 1.10.5.1 (en la App Store, la 1.10.5 build 9) envía `'2'`.&quot;
     }
   }
 }</pre>
@@ -3206,14 +3245,15 @@ summary { cursor: pointer; color: var(--enlace); }
 </section>
 <section id="esquema-Noticia" class="esquema">
 <h3><code>Noticia</code></h3>
-<p>La pantalla de inicio recorre <code>values</code> y lee <code>id</code>, <code>titulo</code> e <code>imagen</code>; el resto de claves no está fijado por contrato.</p>
+<p>Inicio recorre <code>values</code> y lee <code>id</code> (la clave de cada tarjeta), <code>titulo</code>, <code>imagen</code>, <code>publico</code> y <code>fecha_publicacion</code>; el detalle de la noticia (<code>screens/home/Newsletter.js</code>) recibe la misma fila y lee además <code>descripcion</code> y <code>enlace</code>. El resto de claves no está fijado por contrato.</p>
 <div class="tabla">
 <table>
 <thead><tr><th>campo</th><th>tipo</th><th>obligatorio</th><th>descripción y reglas</th></tr></thead>
 <tbody>
-<tr><td><code>id</code></td><td><code>integer</code></td><td>no</td><td></td></tr>
+<tr><td><code>id</code></td><td><code>string</code></td><td>no</td><td><p>Llega como texto (medido el 2026-10-14). La app solo lo usa como clave.</p></td></tr>
 <tr><td><code>titulo</code></td><td><code>string</code></td><td>no</td><td></td></tr>
 <tr><td><code>imagen</code></td><td><code>string</code> (uri) o <code>null</code></td><td>no</td><td></td></tr>
+<tr><td><code>fecha_publicacion</code></td><td><code>string</code> (date)</td><td>no</td><td><p>Día de publicación, <code>AAAA-MM-DD</code>, sin hora: así llegó en las diez noticias del 2026-10-14. Desde la 1.10.6, Inicio y el detalle lo leen como día del calendario, sin pasarlo por <code>Date</code>: leído como medianoche UTC, en Colombia (UTC−5) se mostraba el día anterior. Si llegara con hora, se muestra el día que es en el teléfono.</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -3221,10 +3261,11 @@ summary { cursor: pointer; color: var(--enlace); }
 <summary>JSON del esquema</summary>
 <pre class="json">{
   &quot;type&quot;: &quot;object&quot;,
-  &quot;description&quot;: &quot;La pantalla de inicio recorre `values` y lee `id`, `titulo` e `imagen`; el resto de claves no está fijado por contrato.&quot;,
+  &quot;description&quot;: &quot;Inicio recorre `values` y lee `id` (la clave de cada tarjeta), `titulo`, `imagen`, `publico` y `fecha_publicacion`; el detalle de la noticia (`screens/home/Newsletter.js`) recibe la misma fila y lee además `descripcion` y `enlace`. El resto de claves no está fijado por contrato.&quot;,
   &quot;properties&quot;: {
     &quot;id&quot;: {
-      &quot;type&quot;: &quot;integer&quot;
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;Llega como texto (medido el 2026-10-14). La app solo lo usa como clave.&quot;
     },
     &quot;titulo&quot;: {
       &quot;type&quot;: &quot;string&quot;
@@ -3233,6 +3274,11 @@ summary { cursor: pointer; color: var(--enlace); }
       &quot;type&quot;: &quot;string&quot;,
       &quot;format&quot;: &quot;uri&quot;,
       &quot;nullable&quot;: true
+    },
+    &quot;fecha_publicacion&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;date&quot;,
+      &quot;description&quot;: &quot;Día de publicación, `AAAA-MM-DD`, sin hora: así llegó en las diez noticias del 2026-10-14. Desde la 1.10.6, Inicio y el detalle lo leen como día del calendario, sin pasarlo por `Date`: leído como medianoche UTC, en Colombia (UTC−5) se mostraba el día anterior. Si llegara con hora, se muestra el día que es en el teléfono.&quot;
     }
   }
 }</pre>

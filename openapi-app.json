@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "API institucional Piragua: rutas que consume la app móvil",
-    "version": "1.10.5.1",
-    "description": "Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. La versión del contrato es la de la app que describe, la 1.10.5.1; en iOS ese mismo código lleva el número 1.10.5 (build 9), porque Apple solo admite tres números en la versión. Cada operación lleva dos extensiones: `x-estado`, que vale `en uso` cuando el código del árbol la llama hoy y `propuesto` cuando es un contrato que la app necesita y el Sistema todavía tiene que confirmar; y `x-origen`, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es `type: object` con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba `__tests__/openapi-app.test.js` cruza las rutas de `slices/` contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (`__tests__/openapi-ejemplos.test.js` comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en `docs/FORMULARIOS.md`, y `__tests__/formularios-doc.test.js` las ata a `validarLluvia` y a `slices/constants.js`. El manual de referencia en HTML, `docs/api/index.html`, se genera desde este contrato con `node bin/generar-manual-api.mjs`; `__tests__/manual-api.test.js` falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8 (también en `x-version-api`), la de la especificación oficial del Programa, publicada en https://piragua.corantioquia.gov.co/developers/api.yaml; los códigos de respuesta, la ruta `/documentos` y la forma de `/multimedias` salen de esa especificación. El cotejo operación por operación, con las diferencias y a quién le toca cada una, está en `docs/CONTRATO-API.md`.",
+    "version": "1.10.6",
+    "description": "Contrato del API institucional visto desde la app móvil Piragua. No describe el API completo: solo las rutas que el código de la app llama, con el método, los parámetros y la forma de respuesta que la app lee de verdad. La versión del contrato es la de la app que describe, la 1.10.6, con el mismo nombre en las dos tiendas: publicada en Google Play el 2026-10-15 y en revisión en la App Store. Lo que cambia respecto de la 1.10.5.1, que en iOS lleva el número 1.10.5 (build 9) porque Apple solo admite tres números en la versión, va marcado «desde la 1.10.6». Cada operación lleva dos extensiones: `x-estado`, que vale `en uso` cuando el código del árbol la llama hoy y `propuesto` cuando es un contrato que la app necesita y el Sistema todavía tiene que confirmar; y `x-origen`, la lista de ficheros que la llaman. Donde la forma de una respuesta no se conoce, el esquema es `type: object` con la descripción «forma no documentada»: nada de lo que aquí figura se ha inventado. La prueba `__tests__/openapi-app.test.js` cruza las rutas de `slices/` contra este fichero. Cada operación trae un ejemplo de petición y de respuesta con los campos que la app lee; los datos de los ejemplos son ficticios (`__tests__/openapi-ejemplos.test.js` comprueba que ninguna operación se quede sin ejemplo y que cada ejemplo contenga las claves obligatorias de su esquema). Las reglas de los formularios de estaciones (campos obligatorios, rango de la muestra de lluvia, fecha no posterior a hoy y versión de formulario) están en `docs/FORMULARIOS.md`, y `__tests__/formularios-doc.test.js` las ata a `validarLluvia` y a `slices/constants.js`. El manual de referencia en HTML, `docs/api/index.html`, se genera desde este contrato con `node bin/generar-manual-api.mjs`; `__tests__/manual-api.test.js` falla si el contrato cambia y el manual no se regenera. Versión del API contra la que se verificó: API 1.3.8 (también en `x-version-api`), la de la especificación oficial del Programa, publicada en https://piragua.corantioquia.gov.co/developers/api.yaml; los códigos de respuesta, la ruta `/documentos` y la forma de `/multimedias` salen de esa especificación. El cotejo operación por operación, con las diferencias y a quién le toca cada una, está en `docs/CONTRATO-API.md`.",
     "x-version-api": "1.3.8"
   },
   "servers": [
@@ -49,7 +49,7 @@
           "sesion"
         ],
         "summary": "Inicio de sesión (OAuth2, flujo de contraseña)",
-        "description": "La app envía en el cuerpo JSON las credenciales del cliente OAuth2, la concesión `grant_type` con el valor `password` y las de la persona: en `username`, su nombre de usuario o su correo, y en `password`, su contraseña. Desde la 1.10.5.1 la pantalla de ingreso acepta el usuario o el correo (antes exigía un correo) y el cuerpo declara `grant_type`, como hace el portal web ante el mismo servicio (`docs/CONTRATO-API.md`, A-06). La respuesta es el usuario completo con un bloque `oauth2` que trae el `access_token`; la app guarda en el teléfono solo los campos de `ESQUEMA_DE_SESION` (`context/sessionStorage.js`), y el `refresh_token` lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (`slices/tokenDeRenovacion.js`) para renovar el token de acceso con `/oauth2/token/`. `screens/auth/Signup.js` inicia sesión por la misma ruta y con el mismo servicio (`iniciarSesion`, `slices/servicios/usuarios.js`) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene.",
+        "description": "La app envía en el cuerpo JSON las credenciales del cliente OAuth2, la concesión `grant_type` con el valor `password` y las de la persona: en `username`, su nombre de usuario o su correo, y en `password`, su contraseña. Desde la 1.10.5.1 la pantalla de ingreso acepta el usuario o el correo (antes exigía un correo) y el cuerpo declara `grant_type`, como hace el portal web ante el mismo servicio (`docs/CONTRATO-API.md`, A-06). La respuesta es el usuario completo con un bloque `oauth2` que trae el `access_token`; la app guarda en el teléfono solo los campos de `ESQUEMA_DE_SESION` (`context/sessionStorage.js`), y el `refresh_token` lo aparta de la respuesta y lo guarda cifrado en el almacén seguro del sistema (`slices/tokenDeRenovacion.js`) para renovar el token de acceso con `/oauth2/token/`. `screens/auth/Signup.js` inicia sesión por la misma ruta y con el mismo servicio (`iniciarSesion`, `slices/servicios/usuarios.js`) justo después de registrar la cuenta. Sin Bearer: es la llamada que lo obtiene. El servicio distingue mayúsculas en `username` (medido el 2026-10-14: el usuario de prueba tal cual entra y en mayúsculas recibe 400 «Credencial invalida»). Desde la 1.10.6, si el servicio rechaza las credenciales (`invalid_grant` o `Credencial invalida`) y lo escrito no es lo que se envió, porque era un correo con mayúsculas, la app repite el ingreso una sola vez con lo escrito tal cual; ningún otro fallo lo repite (`docs/CONTRATO-API.md`, S-14 y A-10).",
         "operationId": "iniciarSesion",
         "x-estado": "en uso",
         "x-origen": [
@@ -403,7 +403,7 @@
           "sesion"
         ],
         "summary": "Contraseña temporal por correo",
-        "description": "Recibe en `username` el nombre de usuario o el correo de la cuenta, normalizado como en `POST /login`, junto con las credenciales del cliente: lo mismo que manda el portal web. Desde la 1.10.5.1 la pantalla pide el usuario o el correo; antes exigía un correo. La app da la solicitud por aceptada cuando la respuesta trae `ok`; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse.",
+        "description": "Recibe en `username` el nombre de usuario o el correo de la cuenta, normalizado como en `POST /login`, junto con las credenciales del cliente: lo mismo que manda el portal web. Desde la 1.10.5.1 la pantalla pide el usuario o el correo; antes exigía un correo. La app da la solicitud por aceptada cuando la respuesta trae `ok`; si el servicio contesta HTML en vez de JSON, la app lo trata como fallo sin caerse. Desde la 1.10.6, ante el 400 de usuario no encontrado y si lo escrito no es lo que se envió, porque era un correo con mayúsculas, la app repite la petición una sola vez con lo escrito tal cual; ningún otro fallo la repite. Con una cuenta que existe, el servicio respondió 500 sin cuerpo JSON las dos veces que se midió (2026-10-14) y la contraseña no cambió: la app muestra su aviso de que no fue posible procesar la solicitud (`docs/CONTRATO-API.md`, S-15 y A-10).",
         "operationId": "recuperarContrasena",
         "x-estado": "en uso",
         "x-origen": [
@@ -430,7 +430,7 @@
                   },
                   "username": {
                     "type": "string",
-                    "description": "Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva `@`, en minúsculas, como en `POST /login`."
+                    "description": "Nombre de usuario o correo de la cuenta, sin los espacios de los bordes y, si lleva `@`, en minúsculas, como en `POST /login`. Si el servicio no encuentra un correo así normalizado y lo escrito tenía mayúsculas, la app repite la petición una vez con lo escrito tal cual (desde la 1.10.6)."
                   }
                 }
               },
@@ -649,10 +649,12 @@
           "medidores"
         ],
         "summary": "Estaciones de lluvia del usuario",
+        "description": "Desde la 1.10.6, cada lista que llega con un 200 se guarda en el teléfono, una copia por cuenta y solo con los campos que lee la app (`slices/medidoresGuardados.js`): «Tus lluviómetros» la muestra mientras llega la del servidor y, si el servidor no responde, la deja a la vista con un aviso. Un 200 sin `values` ni `results` no se toma como lista vacía. El cierre de sesión, también el que sigue a eliminar la cuenta, borra las copias.",
         "operationId": "listarMedidores",
         "x-estado": "en uso",
         "x-origen": [
-          "screens/stations/Estaciones.js"
+          "screens/stations/Estaciones.js",
+          "slices/medidoresGuardados.js"
         ],
         "security": [
           {
@@ -708,7 +710,7 @@
           "medidores"
         ],
         "summary": "Registrar una estación de lluvia",
-        "description": "El campo del formulario `fuente` viaja como `predio`. Las coordenadas salen del GPS del teléfono con siete decimales y viajan como número; la altitud, redondeada a entero. La estación queda pendiente de aprobación por el Programa.",
+        "description": "El campo del formulario `fuente` viaja como `predio`. Las coordenadas salen del GPS del teléfono con siete decimales y viajan como número; la altitud, redondeada a entero. Desde la 1.10.6 el cuerpo lleva también `municipio` y `territorial`, los ids del catálogo de municipios (`GET /municipios?simple=1`) para el municipio elegido en el formulario, que llega marcado con el del perfil: el servicio los exige y no los deduce de las coordenadas (medido el 2026-10-14; `docs/CONTRATO-API.md`, fila 9 y S-12). Sin el catálogo, o sin el territorial del municipio elegido, la pantalla no envía ni encola el alta: avisa que no se pudieron cargar los municipios, pide revisar la conexión e intentarlo de nuevo, y quita el aviso cuando llega el catálogo. La estación queda pendiente de aprobación por el Programa.",
         "operationId": "crearMedidor",
         "x-estado": "en uso",
         "x-origen": [
@@ -732,7 +734,9 @@
                 "latitud": 6.2518,
                 "longitud": -75.5636,
                 "altitud": 1495,
-                "version_formulario": "2"
+                "municipio": 2,
+                "territorial": 4,
+                "version_formulario": "3"
               }
             }
           }
@@ -753,6 +757,24 @@
                   "activo": false,
                   "latitud": 6.2518,
                   "longitud": -75.5636
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validación del servicio. Con el cuerpo vacío responde 400 con `latitud`, `longitud`, `municipio` y `territorial` (sonda del 2026-10-14). Ese día, en producción, un alta real desde la app, con todos los campos del formulario llenos y sin `municipio` ni `territorial`, que la app aún no enviaba, fue rechazada con «Este campo es requerido.» en cada uno; el registro de esa prueba guarda el texto de la pantalla, no el código HTTP. Desde la 1.10.6 la pantalla los envía, y si el servicio rechaza alguno de los dos, el aviso sale junto al selector de municipio y no en el recuadro del formulario.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDeValidacion"
+                },
+                "example": {
+                  "municipio": [
+                    "Este campo es requerido."
+                  ],
+                  "territorial": [
+                    "Este campo es requerido."
+                  ]
                 }
               }
             }
@@ -1256,7 +1278,7 @@
           "estaciones"
         ],
         "summary": "Resumen meteorológico diario de una estación",
-        "description": "La ruta lleva la barra final de la especificación (`/estaciones/{codigo}/meteorologia/{frecuencia}/`): sin ella el servidor responde con una redirección 301, que añade una petición más a Inicio. La app la llama así desde la 1.10.5. Pide `size=1` y usa la primera fila de la lista: la de `values` o, si la respuesta la trae en `results`, como la describe la especificación, la de `results`. Cada magnitud se toma solo si su bandera `calidad_*` vale 1; si no, o si no llega ninguna fila, Inicio muestra 0.",
+        "description": "La ruta lleva la barra final de la especificación (`/estaciones/{codigo}/meteorologia/{frecuencia}/`): sin ella el servidor responde con una redirección 301, que añade una petición más a Inicio. La app la llama así desde la 1.10.5. Pide `size=1` y usa la primera fila de la lista: la de `values` o, si la respuesta la trae en `results`, como la describe la especificación, la de `results`. Cada magnitud se toma solo si su bandera `calidad_*` vale 1 y trae un número; si no, Inicio muestra «—» (hasta la 1.10.5.1, 0). Desde la 1.10.6, Inicio lee además el día del dato, los diez primeros caracteres de `fecha`, y lo compara con la fecha del teléfono: con el dato de hoy rotula «Lluvia hoy»; de uno a tres días antes, «Lluvia del 12 de oct.» y, bajo la estación, «Último dato: 12 de octubre»; más viejo, sin `fecha` legible o sin ninguna fila, «—» en las tres cifras y «Sin datos recientes de esta estación». Las magnitudes llegan como texto con decimales (medido el 2026-10-14) y la app las lee como número sin truncarlas: la lluvia con un decimal como mucho, y la temperatura y la humedad redondeadas a entero.",
         "operationId": "meteorologiaDiaria",
         "x-estado": "en uso",
         "x-origen": [
@@ -1287,11 +1309,12 @@
                   "previous": null,
                   "values": [
                     {
-                      "lluvia": 4.2,
+                      "fecha": "2026-10-13",
+                      "lluvia": "4.2",
                       "calidad_lluvia": 1,
-                      "temperatura": 21.7,
+                      "temperatura": "21.7",
                       "calidad_temperatura": 1,
-                      "humedad_relativa": 78,
+                      "humedad_relativa": "78.4",
                       "calidad_humedad_relativa": 1
                     }
                   ]
@@ -1345,9 +1368,10 @@
                   "previous": null,
                   "values": [
                     {
-                      "id": 12,
+                      "id": "12",
                       "titulo": "Jornada de monitoreo comunitario",
-                      "imagen": "https://geopiragua.corantioquia.gov.co/media/noticias/jornada.jpg"
+                      "imagen": "https://geopiragua.corantioquia.gov.co/media/noticias/jornada.jpg",
+                      "fecha_publicacion": "2026-10-01"
                     }
                   ]
                 }
@@ -1369,7 +1393,7 @@
           "contenido"
         ],
         "summary": "Cursos y eventos",
-        "description": "La pantalla de actividades hace tres llamadas seguidas: por año, por año y mes, y por año, mes y semana. Separa los elementos por `tipo` (`Evento` frente al resto).",
+        "description": "La pantalla de actividades pide, una tras otra, las del año, las del mes y las de la semana en curso. Separa los elementos por `tipo` (`Evento` frente al resto). Desde la 1.10.6, la semana es la ISO 8601 y se pide con el año y el mes de sus días: el servicio cuenta `week` como semana ISO y la aplica junto con `month` (medido el 2026-10-14: `year=2026&month=5&week=19` devuelve las actividades del lunes 4 y el jueves 7 de mayo y no las del lunes 11; `year=2026&month=4&week=18`, las del 27 y el 29 de abril, y `year=2026&month=5&week=18`, ninguna). Una semana que empieza en un mes y acaba en otro, o en otro año, se pide en dos consultas a la vez: la semana 53 de 2026, del 28 de diciembre al 3 de enero, son `year=2026&month=12&week=53` y `year=2027&month=1&week=53`.",
         "operationId": "listarActividades",
         "x-estado": "en uso",
         "x-origen": [
@@ -1402,7 +1426,7 @@
           {
             "name": "week",
             "in": "query",
-            "description": "Semana del año calculada por la app.",
+            "description": "Semana ISO 8601 (de lunes a domingo; la semana 1 es la del primer jueves del año), como la cuenta el servicio. Hasta la 1.10.5.1 la app usaba una cuenta propia que en 2026 daba la semana anterior los lunes y la siguiente los sábados.",
             "schema": {
               "type": "integer"
             }
@@ -2382,7 +2406,7 @@
           },
           "username": {
             "type": "string",
-            "description": "Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva `@`, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas."
+            "description": "Nombre de usuario o correo de la cuenta, sin los espacios de los bordes. Si lleva `@`, viaja en minúsculas, como lo normaliza el registro; un nombre de usuario viaja tal cual, porque puede distinguir mayúsculas. Si el servicio rechaza un correo así normalizado y lo escrito tenía mayúsculas, la app repite el ingreso una vez con lo escrito tal cual (desde la 1.10.6)."
           },
           "password": {
             "type": "string",
@@ -2706,21 +2730,28 @@
       "MeteorologiaDiaria": {
         "type": "object",
         "properties": {
+          "fecha": {
+            "type": "string",
+            "description": "Día del resumen, `AAAA-MM-DD` al comienzo de la cadena. Inicio compara sus diez primeros caracteres con la fecha del teléfono para decir de qué día es el dato (desde la 1.10.6)."
+          },
           "lluvia": {
-            "type": "number"
+            "type": "string",
+            "description": "Milímetros. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número."
           },
           "calidad_lluvia": {
             "type": "integer",
             "description": "1 cuando el dato es válido."
           },
           "temperatura": {
-            "type": "number"
+            "type": "string",
+            "description": "Grados Celsius. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número."
           },
           "calidad_temperatura": {
             "type": "integer"
           },
           "humedad_relativa": {
-            "type": "number"
+            "type": "string",
+            "description": "Por ciento. Texto con decimales, como lo manda el servicio (medido el 2026-10-14); la app lo convierte a número."
           },
           "calidad_humedad_relativa": {
             "type": "integer"
@@ -2780,13 +2811,15 @@
       },
       "MedidorNuevo": {
         "type": "object",
-        "description": "Alta de una estación de lluvia tal como la arma `screens/stations/Registroestacion.js`. Campos obligatorios, rangos y política de versiones en `docs/FORMULARIOS.md`.",
+        "description": "Alta de una estación de lluvia tal como la arma `screens/stations/Registroestacion.js`. Desde la 1.10.6 lleva `municipio` y `territorial`, que el servicio exige. Campos obligatorios, rangos y política de versiones en `docs/FORMULARIOS.md`.",
         "required": [
           "predio",
           "ubicacion",
           "latitud",
           "longitud",
-          "altitud"
+          "altitud",
+          "municipio",
+          "territorial"
         ],
         "properties": {
           "predio": {
@@ -2815,9 +2848,17 @@
             "description": "Metros. La pantalla redondea la que se escribe con decimales y no envía el alta sin ella: la especificación del API 1.3.8 la exige.",
             "x-unidad": "metros"
           },
+          "municipio": {
+            "type": "integer",
+            "description": "Id del municipio donde está el lluviómetro: el `id` de su fila en el catálogo `GET /municipios?simple=1`. El formulario lo pide con una lista que llega marcada con el municipio del perfil (el `municipio` que trae el ingreso) y que la persona puede cambiar. El servicio lo exige: sin él responde 400 con «Este campo es requerido.» (medido el 2026-10-14). Desde la 1.10.6."
+          },
+          "territorial": {
+            "type": "integer",
+            "description": "Id de la territorial de ese municipio: el `territorial` de la misma fila del catálogo. No se escribe en el formulario. El servicio lo exige y no lo deduce de las coordenadas (medido el 2026-10-14). Desde la 1.10.6."
+          },
           "version_formulario": {
             "type": "string",
-            "description": "Versión del formulario que originó el registro: `VERSION_FORMULARIO_MEDIDOR` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`."
+            "description": "Versión del formulario que originó el registro: `VERSION_FORMULARIO_MEDIDOR` de `slices/constants.js`, que el servicio añade al cuerpo. Se sube según la política de `docs/FORMULARIOS.md`: es `'3'` desde la 1.10.6, que añade `municipio` y `territorial`; la 1.10.5.1 (en la App Store, la 1.10.5 build 9) envía `'2'`."
           }
         }
       },
@@ -3004,10 +3045,11 @@
       },
       "Noticia": {
         "type": "object",
-        "description": "La pantalla de inicio recorre `values` y lee `id`, `titulo` e `imagen`; el resto de claves no está fijado por contrato.",
+        "description": "Inicio recorre `values` y lee `id` (la clave de cada tarjeta), `titulo`, `imagen`, `publico` y `fecha_publicacion`; el detalle de la noticia (`screens/home/Newsletter.js`) recibe la misma fila y lee además `descripcion` y `enlace`. El resto de claves no está fijado por contrato.",
         "properties": {
           "id": {
-            "type": "integer"
+            "type": "string",
+            "description": "Llega como texto (medido el 2026-10-14). La app solo lo usa como clave."
           },
           "titulo": {
             "type": "string"
@@ -3016,6 +3058,11 @@
             "type": "string",
             "format": "uri",
             "nullable": true
+          },
+          "fecha_publicacion": {
+            "type": "string",
+            "format": "date",
+            "description": "Día de publicación, `AAAA-MM-DD`, sin hora: así llegó en las diez noticias del 2026-10-14. Desde la 1.10.6, Inicio y el detalle lo leen como día del calendario, sin pasarlo por `Date`: leído como medianoche UTC, en Colombia (UTC−5) se mostraba el día anterior. Si llegara con hora, se muestra el día que es en el teléfono."
           }
         }
       },
